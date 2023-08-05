@@ -15,6 +15,9 @@ ENV watch-interval=3600
 #Expose the nessasary volumes
 VOLUME /photos
 
+#Install the Python dependancies
+RUN pip install --no-cache-dir -r requirements.txt
+
 # Expose port 8080 to the outside world
 EXPOSE 8080
 

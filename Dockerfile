@@ -6,6 +6,7 @@ WORKDIR /src
 
 #Copy the code into the conatiner
 COPY /src .
+COPY requirements.txt requirements.txt
 
 # Define environment veriables
 ENV TZ="America/London"
@@ -18,11 +19,11 @@ VOLUME /photos
 #Install the Python dependancies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose port 8080 to the outside world
-EXPOSE 8080
+# Expose port 5000 to the outside world
+EXPOSE 5000
 
 # Create health check to check / url
 HEALTHCHECK --interval=5m --timeout=3s --start-period=10s --retries=3 CMD curl -f http://localhost:8080/ || exit 1
 
 # Command to run the executable
-CMD [ "python3", "-u", "./src/main.py" ]
+CMD ["flask", "run", "--host=0.0.0.0"]

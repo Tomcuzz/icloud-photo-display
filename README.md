@@ -7,7 +7,7 @@ A web view that show photo downloaded from iCloud
 With Docker using the following command:
 
 ```
-docker run -it --rm --name icloudpd -v $(pwd)/Photos:/data -e TZ=America/London tomcuzz/icloudpd:latest icloud-photo-display --directory /data --username my@email.address --watch-with-interval 3600
+docker run -it --rm --name icloudpd -v $(pwd)/Photos:/data -e TZ=America/London tomcuzz/icloudpd:latest icloud-photo-display --username my@email.address --watch-interval 3600
 ```
 
 ## Credits

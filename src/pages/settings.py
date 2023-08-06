@@ -1,6 +1,5 @@
 """ Code to home web page """
-import os
-from flask import render_template, abort
+from flask import render_template
 from src.helpers import settings
 
 def add_settings_pages(app, configs:settings.Settings):

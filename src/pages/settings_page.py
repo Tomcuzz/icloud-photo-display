@@ -8,4 +8,3 @@ def add_settings_pages(app, configs:Settings):
     def settings_page():
         """ Settings Page """
         return render_template('settings.html', Configs=configs)
-

@@ -15,14 +15,14 @@ class Settings(object):
     def load_settings(self):
         """ Load settings from disk """
         try:
-            f = open(self.config_file, encoding="utf-8")
-            data = json.load(f)
+            file = open(self.config_file, encoding="utf-8")
+            data = json.load(file)
             self.photo_location = data['photo_location']
             self.loggedin = data['logged_in']
             self.username = data['username']
             self.password = data['password']
-        finally:
-            f.close()
+        except Exception as error:
+            print('Error loading configs:', error)
 
     def save_settings(self):
         """ Save settings from disk """
@@ -34,7 +34,7 @@ class Settings(object):
                 'password': self.password
             }
             settings_json = json.dumps(settings_dict)
-            f = open(self.config_file,"w", encoding="utf-8")
-            f.write(settings_json)
-        finally:
-            f.close()
+            file = open(self.config_file,"w", encoding="utf-8")
+            file.write(settings_json)
+        except Exception as error:
+            print('Error loading configs:', error)

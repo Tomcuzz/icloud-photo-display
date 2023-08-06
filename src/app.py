@@ -1,9 +1,7 @@
 """ Code to run icloud photo display """
 from flask import Flask
+from src.pages import home
 
 app = Flask(__name__)
 
-@app.route("/")
-def home_page():
-    """ Home Page """
-    return "<p>Hello, World!</p>"
+home.add_home_page(app)

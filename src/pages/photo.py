@@ -2,13 +2,15 @@
 import os
 import random
 from flask import render_template, abort
+from prometheus_client import Counter
 
-def add_photo_page(app, photo_dir:str="/photos"):
+def add_photo_page(app, photo_requests_counter:Counter, photo_dir:str="/photos"):
     """ Add Home Page """
     @app.route("/photo")
     @app.route('/photo/<int:refresh>')
     def photo_page(refresh=900):
         """ Photo Page """
+        photo_requests_counter.inc()
         photo = random.choice(os.listdir(photo_dir))
         return render_template('photo.html', Refresh=refresh, URL=photo)
 

@@ -1,3 +1,5 @@
 wheel>=0.40.0,<0.41
 icloudpd
 Flask
+prometheus-client
+requests

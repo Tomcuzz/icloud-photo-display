@@ -1,6 +1,6 @@
-import six
-import uuid
+import http.cookiejar as cookielib
 import hashlib
+import uuid
 import inspect
 import json
 import logging
@@ -10,6 +10,7 @@ import tempfile
 import os
 from re import match
 import urllib3
+import six
 
 from pyicloud_ipd.exceptions import (
     PyiCloudConnectionException,
@@ -28,11 +29,6 @@ from pyicloud_ipd.services import (
     AccountService
 )
 from pyicloud_ipd.utils import get_password_from_keyring
-
-if six.PY3:
-    import http.cookiejar as cookielib
-else:
-    import cookielib
 
 
 logger = logging.getLogger(__name__)

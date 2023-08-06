@@ -2,9 +2,10 @@
 import os
 import random
 from flask import render_template, abort
-from src.helpers import settings, metrics
+from src.helpers.settings import Settings
+from src.helpers.metrics import Metrics
 
-def add_photo_page(app, app_metrics:metrics.Metrics, configs:settings.Settings):
+def add_photo_page(app, app_metrics:Metrics, configs:Settings):
     """ Add Home Page """
     @app.route("/photo")
     @app.route('/photo/<int:refresh>')

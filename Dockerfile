@@ -16,6 +16,9 @@ ENV watch-interval=3600
 #Expose the nessasary volumes
 VOLUME /photos
 
+#Update pip
+RUN pip install --upgrade pip
+
 #Install the Python dependancies
 RUN pip install --no-cache-dir -r requirements.txt
 

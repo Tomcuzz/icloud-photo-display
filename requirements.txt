@@ -2,6 +2,7 @@ wheel>=0.40.0,<0.41
 future
 six
 tzlocal
+keyring
 icloudpd
 Flask
 prometheus-client

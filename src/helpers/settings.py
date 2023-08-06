@@ -9,7 +9,6 @@ class Settings(object):
         self.photo_location = working_dir + "/photos"
         self.loggedin = False
         self.username = ""
-        self.password = ""
         self.load_settings()
 
     def load_settings(self):
@@ -20,7 +19,6 @@ class Settings(object):
             self.photo_location = data['photo_location']
             self.loggedin = data['logged_in']
             self.username = data['username']
-            self.password = data['password']
         except Exception as error:
             print('Error loading configs:', error)
 
@@ -30,8 +28,7 @@ class Settings(object):
             settings_dict = {
                 'photo_location': self.photo_location,
                 'logged_in': self.loggedin,
-                'username': self.username,
-                'password': self.password
+                'username': self.username
             }
             settings_json = json.dumps(settings_dict)
             file = open(self.config_file,"w", encoding="utf-8")

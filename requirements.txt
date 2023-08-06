@@ -1,4 +1,7 @@
 wheel>=0.40.0,<0.41
+future
+six
+tzlocal
 icloudpd
 Flask
 prometheus-client

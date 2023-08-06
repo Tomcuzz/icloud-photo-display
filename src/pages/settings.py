@@ -1,10 +1,12 @@
-""" Code to settings web page """
-from flask import render_template
+""" Code to home web page """
+import os
+from flask import render_template, abort
+from src.helpers import settings
 
+def add_settings_pages(app, configs:settings.Settings):
+    """ Add Settings Page """
+    @app.route("/settings")
+    def settings_page():
+        """ Settings Page """
+        return render_template('settings.html', Configs=configs)
 
-def add_home_page(app):
-    """ Add Home Page """
-    @app.route("/")
-    def home_page():
-        """ Home Page """
-        return render_template('home.html')

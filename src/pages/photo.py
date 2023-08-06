@@ -1,18 +1,20 @@
 """ Code to home web page """
 import os
-from flask import abort
+import random
+from flask import render_template, abort
 
-def add_photo_page(app):
+def add_photo_page(app, photo_dir:str="/photos"):
     """ Add Home Page """
     @app.route("/photo")
     @app.route('/photo/<int:refresh>')
     def photo_page(refresh=900):
         """ Photo Page """
-        return "<p>Photo page to go here! <br> Refresh is: " + str(refresh) + "</p>"
+        photo = random.choice(os.listdir(photo_dir))
+        return render_template('photo.html', Refresh=refresh, URL=photo)
 
     @app.route('/photo/<string:filename>')
     def photo_contents(filename=""):
-        filepath = "/photos/"+filename
+        filepath = photo_dir + "/" + filename
         if filename == "" or len(filename.split()) > 1 or not os.path.isfile(filepath):
             abort(404)
         filecontent = open(filepath, "r", encoding="utf-8")

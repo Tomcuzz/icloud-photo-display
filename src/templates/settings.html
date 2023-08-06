@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+
+<table class="table">
+	<thead>
+		<tr>
+			<th scope="col">Setting</th>
+			<th scope="col">Value</th>
+		</tr>
+	</thead>
+	<tbody>
+        <form method="post" action="/Settings/Edit">
+		    <tr>
+				<th scope="row">Photo Location</th>
+                <th scope="row"><input class="form-control" type="text" name="photo_location" value="{{ Configs.photo_location }}"></th>
+            </tr>
+		    <tr>
+				<th scope="row">Username</th>
+                <th scope="row"><input class="form-control" type="text" name="user" value="{{ Configs.username }}"></th>
+            </tr>
+		    <tr>
+				<th scope="row">Password</th>
+                <th scope="row"><input class="form-control" type="password" name="pass"></th>
+            </tr>
+            <tr>
+				<th scope="row"></th>
+				<th scope="row"><button type="submit" class="btn btn-success">Save</button></th>
+		    </tr>
+        </form>
+	</tbody>
+</table>
+
+{% endblock %}

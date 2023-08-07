@@ -7,8 +7,8 @@ import re
 from datetime import datetime
 from future.moves.urllib.parse import urlencode
 
-from pyicloud_ipd.exceptions import PyiCloudServiceNotActivatedErrror
-from pyicloud_ipd.exceptions import PyiCloudAPIResponseError
+from src.pyicloud_ipd.exceptions import PyiCloudServiceNotActivatedErrror
+from src.pyicloud_ipd.exceptions import PyiCloudAPIResponseError
 
 import pytz
 

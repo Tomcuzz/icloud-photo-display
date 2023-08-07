@@ -3,6 +3,8 @@ future
 six
 tzlocal
 keyring
+keyrings.alt
+pytz
 icloudpd
 Flask
 prometheus-client

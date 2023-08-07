@@ -12,14 +12,14 @@ from re import match
 import urllib3
 import six
 
-from pyicloud_ipd.exceptions import (
+from src.pyicloud_ipd.exceptions import (
     PyiCloudConnectionException,
     PyiCloudFailedLoginException,
     PyiCloudAPIResponseError,
     PyiCloud2SARequiredError,
     PyiCloudServiceNotActivatedErrror
 )
-from pyicloud_ipd.services import (
+from src.pyicloud_ipd.services import (
     FindMyiPhoneServiceManager,
     CalendarService,
     UbiquityService,
@@ -28,7 +28,7 @@ from pyicloud_ipd.services import (
     PhotosService,
     AccountService
 )
-from pyicloud_ipd.utils import get_password_from_keyring
+from src.pyicloud_ipd.utils import get_password_from_keyring
 
 
 logger = logging.getLogger(__name__)

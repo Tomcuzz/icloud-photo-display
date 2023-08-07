@@ -2,6 +2,7 @@
 {% block title %}Settings{% endblock %}
 {% block content %}
 
+<h2>Basic Settings</h2>
 <table class="table">
 	<thead>
 		<tr>
@@ -16,18 +17,38 @@
                 <th scope="row"><input class="form-control" type="text" name="photo_location" value="{{ Configs.photo_location }}"></th>
             </tr>
 		    <tr>
-				<th scope="row">Username</th>
+				<th scope="row">iCloud Username</th>
                 <th scope="row"><input class="form-control" type="text" name="user" value="{{ Configs.username }}"></th>
-            </tr>
-		    <tr>
-				<th scope="row">Password</th>
-                <th scope="row"><input class="form-control" type="password" name="pass"></th>
             </tr>
             <tr>
 				<th scope="row"></th>
 				<th scope="row"><button type="submit" class="btn btn-success">Save</button></th>
 		    </tr>
         </form>
+	</tbody>
+</table>
+<br>
+<h2>iCloud Status</h2>
+<table class="table">
+	<thead>
+		<tr>
+			<th scope="col">State</th>
+			<th scope="col">Value</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<th scope="row">Has Username</th>
+			<th scope="row">{{ ICloud.has_username }}</th>
+		</tr>
+		<tr>
+			<th scope="row">Has Password</th>
+			<th scope="row">{{ ICloud.has_password }}</th>
+		</tr>
+		<tr>
+			<th scope="row">Needs 2FA setup</th>
+			<th scope="row">{{ ICloud.needs_2fa_setup }}</th>
+		</tr>
 	</tbody>
 </table>
 

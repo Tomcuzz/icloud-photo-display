@@ -9,3 +9,4 @@ icloudpd
 Flask
 prometheus-client
 requests
+urllib3

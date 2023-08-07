@@ -1,5 +1,5 @@
-from src.pyicloud_ipd import utils, base
-from src.helpers.settings import Settings
+from src.pyicloud_ipd import utils, base # pylint: disable=import-error
+from src.helpers.settings import Settings # pylint: disable=import-error
 
 class ICloud(object):
     def __init__(self, configs:Settings) -> None:

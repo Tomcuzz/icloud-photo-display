@@ -1,15 +1,15 @@
 import http.cookiejar as cookielib
-import hashlib
+import hashlib # pylint: disable=unused-import
 import uuid
 import inspect
 import json
 import logging
-import requests
+from re import match
 import sys
 import tempfile
 import os
-from re import match
-import urllib3
+import urllib3 # pylint: disable=unused-import
+import requests
 import six
 
 from src.pyicloud_ipd.exceptions import (

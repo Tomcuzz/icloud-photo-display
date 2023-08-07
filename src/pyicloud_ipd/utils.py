@@ -1,6 +1,6 @@
 import getpass
-import keyring
 import sys
+import keyring # pylint: disable=import-error
 
 from .exceptions import NoStoredPasswordAvailable
 

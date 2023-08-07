@@ -1,7 +1,7 @@
 """ Code to home web page """
 from flask import render_template, request, redirect, url_for
-from src.helpers.settings import Settings
-from src.helpers.icloud import ICloud
+from src.helpers.settings import Settings # pylint: disable=import-error
+from src.helpers.icloud import ICloud # pylint: disable=import-error
 
 def add_settings_pages(app, configs:Settings, icloud_helper:ICloud):
     """ Add Settings Page """

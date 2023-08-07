@@ -2,8 +2,8 @@
 import os
 import random
 from flask import render_template, abort
-from src.helpers.settings import Settings
-from src.helpers.metrics import Metrics
+from src.helpers.settings import Settings # pylint: disable=import-error
+from src.helpers.metrics import Metrics # pylint: disable=import-error
 
 def add_photo_page(app, app_metrics:Metrics, configs:Settings):
     """ Add Home Page """

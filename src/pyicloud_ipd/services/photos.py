@@ -7,10 +7,10 @@ import re
 from datetime import datetime
 from future.moves.urllib.parse import urlencode
 
+import pytz
+
 from src.pyicloud_ipd.exceptions import PyiCloudServiceNotActivatedErrror
 from src.pyicloud_ipd.exceptions import PyiCloudAPIResponseError
-
-import pytz
 
 logger = logging.getLogger(__name__)
 

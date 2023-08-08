@@ -40,4 +40,11 @@ def add_settings_pages(app, configs:Settings, icloud_helper:ICloud):
     @app.route("/settings/2fa/submit")
     def settings_2fa_submit_page():
         """ 2FA Page """
-        pass
+        if (request.method == 'POST' and
+            request.form['device_id'] != "" and
+            request.form['code'] != ""):
+            if icloud_helper.validate_2fa_code(
+                int(request.form['device_id']),
+                request.form['code']):
+                return redirect(url_for('settings_page'))
+        return redirect(url_for('settings_2fa_device_page'))

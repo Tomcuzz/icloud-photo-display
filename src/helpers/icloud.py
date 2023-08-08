@@ -60,17 +60,14 @@ class ICloud(object):
             'deviceName',
             "SMS to %s" % self.auth_trusted_devices[device_id].get('phoneNumber'))
 
-    def send_2fa_code(self, device:int) -> bool:
+    def send_2fa_code(self, device_id:int) -> bool:
         """ Request 2fa code send """
-        if self.auth_trusted_devices is None:
+        if self.auth_trusted_devices is None or len(self.auth_trusted_devices) < device_id or device_id < 0:
             return False
-        if len(self.auth_trusted_devices) < device and device >= 0:
-            return False
-        self.selected_auth_trusted_device = self.auth_trusted_devices[device]
-        return self.api.send_verification_code(self.selected_auth_trusted_device)
+        return self.api.send_verification_code(self.auth_trusted_devices[device_id])
 
-    def validate_2fa_code(self, code:str) -> bool:
+    def validate_2fa_code(self, device_id:int, code:str) -> bool:
         """ Validate 2fa code """
-        if not self.auth_trusted_devices or not self.selected_auth_trusted_device:
+        if self.auth_trusted_devices is None or len(self.auth_trusted_devices) < device_id or device_id < 0:
             return False
-        return self.api.validate_verification_code(self.selected_auth_trusted_device, code)
+        return self.api.validate_verification_code(self.auth_trusted_devices[device_id], code)

@@ -64,7 +64,7 @@ class ICloud(object):
         """ Request 2fa code send """
         if self.auth_trusted_devices is None:
             return False
-        if len(self.auth_trusted_devices) < device:
+        if len(self.auth_trusted_devices) < device and device >= 0:
             return False
         self.selected_auth_trusted_device = self.auth_trusted_devices[device]
         return self.api.send_verification_code(self.selected_auth_trusted_device)

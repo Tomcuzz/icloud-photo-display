@@ -31,7 +31,7 @@ def add_settings_pages(app, configs:Settings, icloud_helper:ICloud):
     @app.route("/settings/2fa/<int:device>")
     def settings_2fa_request_page(device):
         """ 2FA Page """
-        if device < 0 or device > len(icloud_helper.auth_trusted_devices):
+        if icloud_helper.send_2fa_code(device):
             abort(404)
         return render_template(
             '2fa_input', 

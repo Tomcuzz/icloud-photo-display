@@ -7,6 +7,7 @@ class Settings(object):
         self.working_dir = working_dir
         self.config_file = working_dir + "/" + config_file
         self.photo_location = working_dir + "/photos"
+        self.watch_interval = 3600
         self.loggedin = False
         self.username = ""
         self.load_settings()
@@ -17,6 +18,7 @@ class Settings(object):
             file = open(self.config_file, encoding="utf-8")
             data = json.load(file)
             self.photo_location = data['photo_location']
+            self.watch_interval = data['watch_interval']
             self.loggedin = data['logged_in']
             self.username = data['username']
         except Exception as error:
@@ -27,8 +29,9 @@ class Settings(object):
         try:
             settings_dict = {
                 'photo_location': self.photo_location,
+                'watch_interval': self.watch_interval
                 'logged_in': self.loggedin,
-                'username': self.username
+                'username': self.username,
             }
             settings_json = json.dumps(settings_dict)
             file = open(self.config_file,"w", encoding="utf-8")

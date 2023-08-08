@@ -10,8 +10,6 @@ COPY requirements.txt requirements.txt
 
 # Define environment veriables
 ENV TZ="America/London"
-ENV username="my@email.address"
-ENV watch-interval=3600
 
 #Make icloud directory
 RUN mkdir /icloudpd

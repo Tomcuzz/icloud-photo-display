@@ -21,13 +21,13 @@ def add_settings_pages(app, configs:Settings, icloud_helper:ICloud):
     @app.route("/settings/login", methods=['POST'])
     def settings_login_page():
         """ Login Save Page """
-        if not (request.form['user'] == "" and request.form['pass'] != ""):
+        if not (request.form['user'] != "" and request.form['pass'] != ""):
             abort(400)
-        self.configs.username = request.form['user']
+        configs.username = request.form['user']
         configs.save_settings()
         icloud_helper.update_login(request.form['pass'])
         if not icloud_helper.auth_passed:
-            abort(400)
+            abort(401)
         return redirect(url_for('settings_page'))
 
     @app.route("/settings/2fa")

@@ -29,9 +29,9 @@ class Settings(object):
         try:
             settings_dict = {
                 'photo_location': self.photo_location,
-                'watch_interval': self.watch_interval
+                'watch_interval': self.watch_interval,
                 'logged_in': self.loggedin,
-                'username': self.username,
+                'username': self.username
             }
             settings_json = json.dumps(settings_dict)
             file = open(self.config_file,"w", encoding="utf-8")

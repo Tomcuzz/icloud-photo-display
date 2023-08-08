@@ -10,20 +10,25 @@ def add_settings_pages(app, configs:Settings, icloud_helper:ICloud):
         """ Settings Page """
         if (request.method == 'POST' and
             request.form['photo_location'] != "" and
-            request.form['watch_interval'] != "" and
-            request.form['user'] != "" and
-            request.form['pass'] != ""):
+            request.form['watch_interval'] != ""):
             configs.photo_location = request.form['photo_location']
             configs.watch_interval = request.form['watch_interval']
-            if configs.username != request.form['user']:
-                configs.username = request.form['user']
-                configs.save_settings()
-                icloud_helper.update_username()
-            else:
-                configs.save_settings()
+            configs.save_settings()
             return redirect(url_for('home_page'))
 
         return render_template('settings.html', Configs=configs, ICloud=icloud_helper)
+
+    @app.route("/settings/login", methods=['POST'])
+    def settings_login_page():
+        """ Login Save Page """
+        if not (request.form['user'] == "" and request.form['pass'] != ""):
+            abort(400)
+        self.configs.username = request.form['user']
+        configs.save_settings()
+        icloud_helper.update_login(request.form['pass'])
+        if not icloud_helper.auth_passed:
+            abort(400)
+        return redirect(url_for('settings_page'))
 
     @app.route("/settings/2fa")
     def settings_2fa_device_page():

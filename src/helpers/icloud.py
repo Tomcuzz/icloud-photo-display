@@ -1,5 +1,5 @@
 """ iCloud api connection helpers """
-from src.pyicloud_ipd import utils, base # pylint: disable=import-error
+from src.pyicloud_ipd import utils, base, exceptions # pylint: disable=import-error
 from src.helpers.settings import Settings # pylint: disable=import-error
 
 class ICloud(object):
@@ -7,27 +7,40 @@ class ICloud(object):
     def __init__(self, configs:Settings) -> None:
         self.configs = configs
         self.api = self.setup_api()
+        self.auth_passed = False
         self.auth_trusted_devices = None
         self.selected_auth_trusted_device = None
 
-    def setup_api(self) -> base.PyiCloudService:
+    def setup_api(self, password=None) -> base.PyiCloudService:
         """ Setup api connection """
-        if self.configs.username and self.has_password():
+        if not (self.configs.username != ""):
+            return None
+
+        if password != None:
+            passwd = password.strip()
+
+        if self.configs.username:
             try:
-                passwd = utils.get_password_from_keyring(self.configs.username)
                 self.api = base.PyiCloudService(
                     "com",
                     self.configs.username.strip(),
-                    passwd.strip()
+                    passwd
                 )
+                if not passwd or not utils.password_exists_in_keyring(self.configs.username):
+                    utils.store_password_in_keyring(self.configs.username, passwd)
+                self.auth_passed = True
                 return self.api
-            except base.NoStoredPasswordAvailable:
+            except exceptions.NoStoredPasswordAvailable:
+                self.auth_passed = False
                 print('iCloud password not avalible')
+            except exceptions.PyiCloudFailedLoginException:
+                self.auth_passed = False
+                print('iCloud Login Failed')
         return None
 
-    def update_username(self):
+    def update_login(self, password):
         """ Notify that username was updated """
-        self.api = self.setup_api
+        self.api = self.setup_api(password)
 
     @property
     def has_username(self) -> bool:

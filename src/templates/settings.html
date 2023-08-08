@@ -32,6 +32,32 @@
 	</tbody>
 </table>
 <br>
+<h2>Icloud Authentication Settings</h2>
+<table class="table">
+	<thead>
+		<tr>
+			<th scope="col">Setting</th>
+			<th scope="col">Value</th>
+		</tr>
+	</thead>
+	<tbody>
+        <form method="POST" action="/settings/login">
+		    <tr>
+				<th scope="row">iCloud Username</th>
+                <th scope="row"><input class="form-control" type="text" name="user" value="{{ Configs.username }}"></th>
+            </tr>
+		    <tr>
+				<th scope="row">iCloud Password</th>
+                <th scope="row"><input class="form-control" type="password" name="pass"></th>
+            </tr>
+            <tr>
+				<th scope="row"></th>
+				<th scope="row"><button type="submit" class="btn btn-success">Save</button></th>
+		    </tr>
+        </form>
+	</tbody>
+</table>
+<br>
 <h2>iCloud Status</h2>
 <table class="table">
 	<thead>
@@ -48,6 +74,10 @@
 		<tr>
 			<th scope="row">Has Password</th>
 			<th scope="row">{{ ICloud.has_password }}</th>
+		</tr>
+		<tr>
+			<th scope="row">Authentication Passed</th>
+			<th scope="row">{{ ICloud.auth_passed }}</th>
 		</tr>
 		<tr>
 			<th scope="row">Needs 2FA setup</th>

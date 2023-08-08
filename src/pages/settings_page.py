@@ -22,11 +22,11 @@ def add_settings_pages(app, configs:Settings, icloud_helper:ICloud):
             return redirect(url_for('home_page'))
 
         return render_template('settings.html', Configs=configs, ICloud=icloud_helper)
-    
+
     @app.route("/settings/2fa")
     def settings_2fa_device_page():
         """ 2FA Page """
-        pass
+        return render_template('2fa_select.html', Devices=icloud_helper.get_trusted_devices())
 
     @app.route("/settings/2fa/<int:refresh>")
     def settings_2fa_request_page():

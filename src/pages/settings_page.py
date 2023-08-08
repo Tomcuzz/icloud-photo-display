@@ -1,5 +1,5 @@
 """ Code to home web page """
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, abort
 from src.helpers.settings import Settings # pylint: disable=import-error
 from src.helpers.icloud import ICloud # pylint: disable=import-error
 
@@ -28,11 +28,14 @@ def add_settings_pages(app, configs:Settings, icloud_helper:ICloud):
         """ 2FA Page """
         return render_template('2fa_select.html', Devices=icloud_helper.get_trusted_devices())
 
-    @app.route("/settings/2fa/<int:refresh>")
-    def settings_2fa_request_page():
+    @app.route("/settings/2fa/<int:device>")
+    def settings_2fa_request_page(device):
         """ 2FA Page """
-        pass
-
+        if device < 0 or device > len(icloud_helper.auth_trusted_devices):
+            abort(404)
+        return render_template(
+            '2fa_input', 
+            device_id=device, device_name=icloud_helper.describe_trusted_device(device))
 
     @app.route("/settings/2fa/submit")
     def settings_2fa_submit_page():

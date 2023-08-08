@@ -50,11 +50,15 @@ class ICloud(object):
         """ List Trused 2fa devices """
         self.auth_trusted_devices = self.api.trusted_devices
         trusted_devices = []
-        for i, device in enumerate(self.auth_trusted_devices):
-            trusted_devices[i] = device.get(
-                    'deviceName',
-                    "SMS to %s" % device.get('phoneNumber'))
+        for i, _ in enumerate(self.auth_trusted_devices):
+            trusted_devices[i] = self.describe_trusted_device(i)
         return self.api.trusted_devices
+
+    def describe_trusted_device(self, device_id:int) -> str:
+        """ Get Name For Trused 2fa Devices Given ID """
+        return self.auth_trusted_devices[device_id].get(
+            'deviceName',
+            "SMS to %s" % self.auth_trusted_devices[device_id].get('phoneNumber'))
 
     def send_2fa_code(self, device:int) -> bool:
         """ Request 2fa code send """

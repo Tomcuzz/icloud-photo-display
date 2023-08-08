@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}2FA Select - Settings{% endblock %}
+{% block content %}
+
+<h2>Input 2FA Code</h2>
+<table class="table">
+	<thead>
+		<tr>
+			<th scope="col">Code</th>
+            <th scope="col">Action</th>
+		</tr>
+	</thead>
+	<tbody>
+        <form method="POST" action="/settings/2fa/{{ device_id }}">
+            <th>
+                <th scope="row">{{ device_name }}</th>
+                <th scope="row">
+                    <input class="form-control" type="text" name="code" placeholder="2FA Code">
+                    <input type="hidden" id="device_id" name="device_id" value="{{ device_id }}" />
+                    <button type="submit" class="btn btn-success">Submit Code</button>
+                    <button href="/settings/2fa/{{ device_id }}" class="btn btn-success">Resend Code</button>
+                </th>
+            </th>
+        </form>
+	</tbody>
+</table>
+
+{% endblock %}

@@ -3,14 +3,17 @@
 {% block content %}
 
 <h2>2 Factor Authentication Needed</h2>
+<br>
 <form method="POST" action="/settings/2fa/submit">
     <label for="2fa_code">2 Factor Code:</label>
     <input class="form-control" type="text" id="2fa_code" name="code" placeholder="2FA Code">
     <input type="hidden" id="device_id" name="device_id" value="{{ Devices|length }}" />
+    <br>
     <button type="submit" class="btn btn-success">Submit Code</button>
 </form>
 <br>
-
+<br>
+<br>
 <h2>Other 2FA Devices</h2>
 <table class="table">
 	<thead>
@@ -23,7 +26,7 @@
         {% for device in Devices %}
             <tr>
                 <th scope="row">{{ device }}</th>
-                <th><a class="btn btn-success" href="/settings/2fa/{{ loop.index0 }}">Resend Code</a></th>
+                <th><a class="btn btn-success" href="/settings/2fa/{{ loop.index0 }}">Send Code</a></th>
             </tr>
         {% endfor %}
 	</tbody>

@@ -219,7 +219,6 @@ class PyiCloudService(object):
                 data=json.dumps(data)
             )
             resp = req.json()
-            print(resp, file=sys.stderr)
         except PyiCloudAPIResponseError as error:
             msg = 'Invalid email/password combination.'
             raise PyiCloudFailedLoginException(msg, error)
@@ -264,7 +263,6 @@ class PyiCloudService(object):
             '%s/listDevices' % self._setup_endpoint,
             params=self.params
         )
-        print(request.json(), file=sys.stderr)
         return request.json().get('devices')
 
     def send_verification_code(self, device):

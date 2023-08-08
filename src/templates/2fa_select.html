@@ -2,7 +2,16 @@
 {% block title %}2FA Select - Settings{% endblock %}
 {% block content %}
 
-<h2>Select 2FA device</h2>
+<h2>2 Factor Authentication Needed</h2>
+<form method="POST" action="/settings/2fa/submit">
+    <label for="2fa_code">2 Factor Code:</label>
+    <input class="form-control" type="text" id="2fa_code" name="code" placeholder="2FA Code">
+    <input type="hidden" id="device_id" name="device_id" value="{{ Devices|length }}" />
+    <button type="submit" class="btn btn-success">Submit Code</button>
+</form>
+<br>
+
+<h2>Other 2FA Devices</h2>
 <table class="table">
 	<thead>
 		<tr>

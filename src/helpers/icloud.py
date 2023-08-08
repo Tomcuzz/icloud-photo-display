@@ -22,7 +22,8 @@ class ICloud(object):
                 self.api = base.PyiCloudService(
                     "com",
                     self.configs.username.strip(),
-                    passwd
+                    passwd,
+                    cookie_directory=self.configs.cookie_directory
                 )
                 if not passwd or not utils.password_exists_in_keyring(self.configs.username):
                     utils.store_password_in_keyring(self.configs.username, passwd)
@@ -78,6 +79,11 @@ class ICloud(object):
 
     def validate_2fa_code(self, device_id:int, code:str) -> bool:
         """ Validate 2fa code """
-        if self.api.trusted_devices is None or len(self.api.trusted_devices) < device_id or device_id < 0:
+        if self.api.trusted_devices is None or device_id < 0:
             return False
-        return self.api.validate_verification_code(self.api.trusted_devices[device_id], code)
+        if len(self.api.trusted_devices) == device_id:
+            device = {}
+            return self.api.validate_verification_code(device, code)
+        if len(self.api.trusted_devices) > device_id:
+            return self.api.validate_verification_code(self.api.trusted_devices[device_id], code)
+        return False

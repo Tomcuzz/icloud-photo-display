@@ -11,8 +11,8 @@
 		</tr>
 	</thead>
 	<tbody>
-        <form method="POST" action="/settings/2fa/{{ device_id }}">
-            <th>
+        <form method="POST" action="/settings/2fa/submit">
+            <tr>
                 <th scope="row">{{ device_name }}</th>
                 <th scope="row">
                     <input class="form-control" type="text" name="code" placeholder="2FA Code">
@@ -20,7 +20,7 @@
                     <button type="submit" class="btn btn-success">Submit Code</button>
                     <button href="/settings/2fa/{{ device_id }}" class="btn btn-success">Resend Code</button>
                 </th>
-            </th>
+            </tr>
         </form>
 	</tbody>
 </table>

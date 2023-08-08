@@ -28,6 +28,8 @@ def add_settings_pages(app, configs:Settings, icloud_helper:ICloud):
         icloud_helper.update_login(request.form['pass'])
         if not icloud_helper.auth_passed:
             abort(401)
+        if icloud_helper.needs_2fa_setup:
+            return redirect(url_for('settings_2fa_device_page'))
         return redirect(url_for('settings_page'))
 
     @app.route("/settings/2fa")
@@ -38,13 +40,13 @@ def add_settings_pages(app, configs:Settings, icloud_helper:ICloud):
     @app.route("/settings/2fa/<int:device>")
     def settings_2fa_request_page(device):
         """ 2FA Page """
-        if icloud_helper.send_2fa_code(device):
+        if not icloud_helper.send_2fa_code(device):
             abort(404)
         return render_template(
-            '2fa_input', 
+            '2fa_input.html', 
             device_id=device, device_name=icloud_helper.describe_trusted_device(device))
 
-    @app.route("/settings/2fa/submit")
+    @app.route("/settings/2fa/submit", methods=['POST'])
     def settings_2fa_submit_page():
         """ 2FA Page """
         if (request.method == 'POST' and

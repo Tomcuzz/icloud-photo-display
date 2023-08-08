@@ -8,8 +8,6 @@ class ICloud(object):
         self.configs = configs
         self.api = self.setup_api()
         self.auth_passed = False
-        self.auth_trusted_devices = None
-        self.selected_auth_trusted_device = None
 
     def setup_api(self, password=None) -> base.PyiCloudService:
         """ Setup api connection """
@@ -61,26 +59,25 @@ class ICloud(object):
 
     def get_trusted_devices(self) -> list:
         """ List Trused 2fa devices """
-        self.auth_trusted_devices = self.api.trusted_devices
         trusted_devices = []
-        for i, _ in enumerate(self.auth_trusted_devices):
-            trusted_devices[i] = self.describe_trusted_device(i)
-        return self.api.trusted_devices
+        for i in range(len(self.api.trusted_devices)):
+            trusted_devices.append(self.describe_trusted_device(i))
+        return trusted_devices
 
     def describe_trusted_device(self, device_id:int) -> str:
         """ Get Name For Trused 2fa Devices Given ID """
-        return self.auth_trusted_devices[device_id].get(
+        return self.api.trusted_devices[device_id].get(
             'deviceName',
-            "SMS to %s" % self.auth_trusted_devices[device_id].get('phoneNumber'))
+            "SMS to %s" % self.api.trusted_devices[device_id].get('phoneNumber'))
 
     def send_2fa_code(self, device_id:int) -> bool:
         """ Request 2fa code send """
-        if self.auth_trusted_devices is None or len(self.auth_trusted_devices) < device_id or device_id < 0:
+        if self.api.trusted_devices is None or len(self.api.trusted_devices) < device_id or device_id < 0:
             return False
-        return self.api.send_verification_code(self.auth_trusted_devices[device_id])
+        return self.api.send_verification_code(self.api.trusted_devices[device_id])
 
     def validate_2fa_code(self, device_id:int, code:str) -> bool:
         """ Validate 2fa code """
-        if self.auth_trusted_devices is None or len(self.auth_trusted_devices) < device_id or device_id < 0:
+        if self.api.trusted_devices is None or len(self.api.trusted_devices) < device_id or device_id < 0:
             return False
-        return self.api.validate_verification_code(self.auth_trusted_devices[device_id], code)
+        return self.api.validate_verification_code(self.api.trusted_devices[device_id], code)

@@ -12,10 +12,10 @@
 	</thead>
 	<tbody>
         {% for device in Devices %}
-            <th>
+            <tr>
                 <th scope="row">{{ device }}</th>
-                <button href="/settings/2fa/{{ loop.index0 }}" class="btn btn-success">Resend Code</button>
-            </th>
+                <th><a class="btn btn-success" href="/settings/2fa/{{ loop.index0 }}">Resend Code</a></th>
+            </tr>
         {% endfor %}
 	</tbody>
 </table>

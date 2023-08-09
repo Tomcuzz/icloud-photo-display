@@ -7,6 +7,7 @@ class Settings(object):
         self.config_file = working_dir + "/" + config_file
         self.cookie_directory = working_dir + "/cookie"
         self.photo_location = working_dir + "/photos"
+        self.icloud_album_name = ""
         self.watch_interval = 3600
         self.loggedin = False
         self.username = ""
@@ -20,6 +21,7 @@ class Settings(object):
             self.photo_location = data['photo_location']
             self.cookie_directory = = data['cookie_location']
             self.watch_interval = data['watch_interval']
+            self.icloud_album_name = data['icloud_album_name']
             self.loggedin = data['logged_in']
             self.username = data['username']
         except Exception as error:
@@ -32,6 +34,7 @@ class Settings(object):
                 'photo_location': self.photo_location,
                 'cookie_location': self.cookie_directory,
                 'watch_interval': self.watch_interval,
+                'icloud_album_name': self.icloud_album_name,
                 'logged_in': self.loggedin,
                 'username': self.username
             }

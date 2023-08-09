@@ -42,6 +42,16 @@ class ICloud(object):
         self.api = self.setup_api(password)
 
     @property
+    def is_authed(self) -> bool:
+        if not self.api:
+            return False
+        elif not has_password:
+            return False
+        elif needs_2fa_setup:
+            return False
+        return True
+
+    @property
     def has_username(self) -> bool:
         """ Check if have saved username """
         return self.configs.username != ""
@@ -86,4 +96,18 @@ class ICloud(object):
             return self.api.validate_verification_code(device, code)
         if len(self.api.trusted_devices) > device_id:
             return self.api.validate_verification_code(self.api.trusted_devices[device_id], code)
+        return False
+    
+    def check_photo_album_exists(self, name) -> bool:
+        """ Check if a given string name is the same as an icloud alum """
+        if not self.is_authed:
+            return False
+        try:
+            albums_dict = self.api.photos.albums
+            if name in albums_dict:
+                return True
+        except PyiCloudAPIResponseError as err:
+            # For later: come up with a nicer message to the user. For now take the
+            # exception text
+            print("Photo album list error: " + err)
         return False

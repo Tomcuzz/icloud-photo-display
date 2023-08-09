@@ -24,8 +24,7 @@ def add_settings_pages(app, configs:Settings, icloud_helper:ICloud):
                 'settings.html',
                 Configs=configs,
                 ICloud=icloud_helper,
-                Settings_error="A Required Field Was Not Provided"
-                )
+                Settings_error="A Required Field Was Not Provided")
 
         return render_template('settings.html', Configs=configs, ICloud=icloud_helper)
 

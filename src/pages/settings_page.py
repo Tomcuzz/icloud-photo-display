@@ -19,6 +19,13 @@ def add_settings_pages(app, configs:Settings, icloud_helper:ICloud):
             configs.icloud_album_name = request.form['icloud_album_name']
             configs.save_settings()
             return redirect(url_for('home_page'))
+        elif request.method == 'POST':
+            return render_template(
+                'settings.html',
+                Configs=configs,
+                ICloud=icloud_helper,
+                Settings_error="A Required Field Was Not Provided"
+                )
 
         return render_template('settings.html', Configs=configs, ICloud=icloud_helper)
 

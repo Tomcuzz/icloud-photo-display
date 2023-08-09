@@ -16,8 +16,16 @@ def add_settings_pages(app, configs:Settings, icloud_helper:ICloud):
             configs.photo_location = request.form['photo_location']
             configs.cookie_location = request.form['cookie_location']
             configs.watch_interval = request.form['watch_interval']
-            configs.icloud_album_name = request.form['icloud_album_name']
-            configs.save_settings()
+            if icloud_helper.is_authed and icloud_helper.photo_album_exists(request.form['icloud_album_name']):
+                configs.icloud_album_name = request.form['icloud_album_name']
+                configs.save_settings()
+            else:
+                configs.save_settings()
+                return render_template(
+                    'settings.html',
+                    Configs=configs,
+                    ICloud=icloud_helper,
+                    Settings_error="iCloud Album Doesn't exist")
             return redirect(url_for('home_page'))
         elif request.method == 'POST':
             return render_template(

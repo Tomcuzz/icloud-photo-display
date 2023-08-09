@@ -98,7 +98,7 @@ class ICloud(object):
             return self.api.validate_verification_code(self.api.trusted_devices[device_id], code)
         return False
     
-    def check_photo_album_exists(self, name) -> bool:
+    def photo_album_exists(self, name) -> bool:
         """ Check if a given string name is the same as an icloud alum """
         if not self.is_authed:
             return False

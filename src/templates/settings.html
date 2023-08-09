@@ -80,8 +80,16 @@
 			<th scope="row">{{ ICloud.auth_passed }}</th>
 		</tr>
 		<tr>
-			<th scope="row">Needs 2FA setup</th>
-			<th scope="row">{{ ICloud.needs_2fa_setup }}</th>
+			<th scope="row"> 2FA Setup</th>
+			<th scope="row">
+				{% ICloud.needs_2fa_setup %}
+					False
+					<br>
+					<button href="/settings/2fa" class="btn btn-success">Setup 2FA</button>
+				{% else %}
+					True
+				{% endif %}
+			</th>
 		</tr>
 	</tbody>
 </table>

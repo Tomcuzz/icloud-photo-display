@@ -26,12 +26,20 @@ def add_settings_pages(app, configs:Settings, icloud_helper:ICloud):
     def settings_login_page():
         """ Login Save Page """
         if not (request.form['user'] != "" and request.form['pass'] != ""):
-            abort(400)
+            return render_template(
+                'settings.html',
+                Configs=configs,
+                ICloud=icloud_helper,
+                ICloud_error="iCloud Credenials Not Provided")
         configs.username = request.form['user']
         configs.save_settings()
         icloud_helper.update_login(request.form['pass'])
         if not icloud_helper.auth_passed:
-            abort(401)
+            return render_template(
+                'settings.html',
+                Configs=configs,
+                ICloud=icloud_helper,
+                ICloud_error="iCloud Login Failed")
         if icloud_helper.needs_2fa_setup:
             return redirect(url_for('settings_2fa_device_page'))
         return redirect(url_for('settings_page'))
@@ -45,7 +53,10 @@ def add_settings_pages(app, configs:Settings, icloud_helper:ICloud):
     def settings_2fa_request_page(device):
         """ 2FA Page """
         if not icloud_helper.send_2fa_code(device):
-            abort(404)
+            return render_template(
+                '2fa_select.html',
+                Devices=icloud_helper.get_trusted_devices(),
+                Mfa_error="Send 2fa Code Failed")
         return render_template(
             '2fa_input.html', 
             device_id=device, device_name=icloud_helper.describe_trusted_device(device))

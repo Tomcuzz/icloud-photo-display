@@ -4,10 +4,9 @@ import json
 class Settings(object):
     """ Settins storage class """
     def __init__(self, working_dir, config_file):
-        self.working_dir = working_dir
         self.config_file = working_dir + "/" + config_file
-        self.photo_location = working_dir + "/photos"
         self.cookie_directory = working_dir + "/cookie"
+        self.photo_location = working_dir + "/photos"
         self.watch_interval = 3600
         self.loggedin = False
         self.username = ""

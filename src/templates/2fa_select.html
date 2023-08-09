@@ -3,6 +3,11 @@
 {% block content %}
 
 <h2>2 Factor Authentication Needed</h2>
+{% if mfa_error %}
+	<div class="alert alert-danger" role="alert">
+		{{ mfa_error }}
+	</div>
+{% endif %}
 <br>
 <form method="POST" action="/settings/2fa/submit">
     <label for="2fa_code">2 Factor Code:</label>
@@ -15,6 +20,11 @@
 <br>
 <br>
 <h2>Other 2FA Devices</h2>
+{% if o2fa_error %}
+	<div class="alert alert-danger" role="alert">
+		{{ o2fa_error }}
+	</div>
+{% endif %}
 <table class="table">
 	<thead>
 		<tr>

@@ -3,6 +3,11 @@
 {% block content %}
 
 <h2>Input 2FA Code</h2>
+{% if mfa_error %}
+	<div class="alert alert-danger" role="alert">
+		{{ mfa_error }}
+	</div>
+{% endif %}
 <table class="table">
 	<thead>
 		<tr>

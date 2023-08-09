@@ -56,7 +56,7 @@ def add_settings_pages(app, configs:Settings, icloud_helper:ICloud):
             return render_template(
                 '2fa_select.html',
                 Devices=icloud_helper.get_trusted_devices(),
-                Mfa_error="Send 2fa Code Failed")
+                O2fa_error="Send 2fa Code Failed")
         return render_template(
             '2fa_input.html', 
             device_id=device, device_name=icloud_helper.describe_trusted_device(device))

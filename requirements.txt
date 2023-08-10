@@ -5,6 +5,7 @@ tzlocal
 keyring
 keyrings.alt
 pytz
+piexif
 icloudpd
 Flask
 prometheus-client

@@ -11,6 +11,8 @@ class Settings(object):
         self.watch_interval = 3600
         self.loggedin = False
         self.username = ""
+        self.max_retries = 5
+        self.wait_seconds = 5
         self.load_settings()
 
     def load_settings(self):
@@ -19,7 +21,7 @@ class Settings(object):
             file = open(self.config_file, encoding="utf-8")
             data = json.load(file)
             self.photo_location = data['photo_location']
-            self.cookie_directory = = data['cookie_location']
+            self.cookie_directory = data['cookie_location']
             self.watch_interval = data['watch_interval']
             self.icloud_album_name = data['icloud_album_name']
             self.loggedin = data['logged_in']

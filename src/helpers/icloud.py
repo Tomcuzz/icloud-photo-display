@@ -1,6 +1,11 @@
 """ iCloud api connection helpers """
 from src.pyicloud_ipd import utils, base, exceptions # pylint: disable=import-error
 from src.helpers.settings import Settings # pylint: disable=import-error
+from src.helpers import exif, download, paths # pylint: disable=import-error
+import piexif
+import logging
+from piexif._exceptions import InvalidImageDataError
+from tzlocal import get_localzone
 
 class ICloud(object):
     """ iCloud api connection class """
@@ -31,10 +36,10 @@ class ICloud(object):
                 return self.api
             except exceptions.NoStoredPasswordAvailable:
                 self.auth_passed = False
-                print('iCloud password not avalible')
+                logging.warning('iCloud password not avalible')
             except exceptions.PyiCloudFailedLoginException:
                 self.auth_passed = False
-                print('iCloud Login Failed')
+                logging.warning('iCloud Login Failed')
         return None
 
     def update_login(self, password):
@@ -98,7 +103,7 @@ class ICloud(object):
             return self.api.validate_verification_code(self.api.trusted_devices[device_id], code)
         return False
     
-    def photo_album_exists(self, name) -> bool:
+    def photo_album_exists(self, name:str) -> bool:
         """ Check if a given string name is the same as an icloud alum """
         if not self.is_authed:
             return False
@@ -109,5 +114,52 @@ class ICloud(object):
         except PyiCloudAPIResponseError as err:
             # For later: come up with a nicer message to the user. For now take the
             # exception text
-            print("Photo album list error: " + err)
+            logging.warning("Photo album list error: " + err)
         return False
+    
+    def download_photo(self, photo, path) -> bool:
+        """ Given a path download a photo from iCloud """
+        try:
+            created_date = photo.created.astimezone(get_localzone())
+        except (ValueError, OSError):
+            logging.error(
+                "Could not convert photo created date to local timezone (%s)",
+                photo.created)
+            created_date = photo.created
+        download_result = download.download_media(
+            self, photo, download_path, download_size
+        )
+        
+        if download_result:
+            if set_exif_datetime and \
+                paths.clean_filename(photo.filename) \
+                .lower().endswith((".jpg", ".jpeg")) and \
+                not exif.get_photo_exif(download_path):
+                    # %Y:%m:%d looks wrong, but it's the correct format
+                    date_str = created_date.strftime(
+                        "%Y-%m-%d %H:%M:%S%z")
+                    set_photo_exif(
+                        download_path,
+                        created_date.strftime("%Y:%m:%d %H:%M:%S"),
+                    )
+            download.set_utime(download_path, created_date)
+    
+    def sync_photo_album(self, album_name:str, local_path:str):
+        """ Download missing photos to local path """
+        for photo in self.api.photos.albums[album_name]:
+            download_path = ""
+            if photo.item_type not in ("image"):
+                continue
+            
+            file_exists = os.path.isfile(download_path)
+            if file_exists:
+                # for later: this crashes if download-size medium is specified
+                file_size = os.stat(download_path).st_size
+                version = photo.versions[download_size]
+                photo_size = version["size"]
+                if file_size != photo_size:
+                    # Looks like files changed.... delete and recreate
+                    continue
+
+            if not file_exists:
+                self.download_photo(photo, download_path)

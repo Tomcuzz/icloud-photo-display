@@ -96,7 +96,9 @@
 		<tr>
 			<th scope="row"> 2FA Setup</th>
 			<th scope="row">
-				{% ICloud.needs_2fa_setup %}
+				{% if not ICloud.auth_passed %}
+					False
+				{% elif ICloud.needs_2fa_setup %}
 					False
 					<br>
 					<button href="/settings/2fa" class="btn btn-success">Setup 2FA</button>

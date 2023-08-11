@@ -21,7 +21,7 @@ class Settings(object):
             file = open(self.config_file, encoding="utf-8")
             data = json.load(file)
             self.photo_location = data['photo_location']
-            self.cookie_directory = data['cookie_location']
+            self.cookie_directory = data['cookie_directory']
             self.watch_interval = data['watch_interval']
             self.icloud_album_name = data['icloud_album_name']
             self.loggedin = data['logged_in']
@@ -34,7 +34,7 @@ class Settings(object):
         try:
             settings_dict = {
                 'photo_location': self.photo_location,
-                'cookie_location': self.cookie_directory,
+                'cookie_directory': self.cookie_directory,
                 'watch_interval': self.watch_interval,
                 'icloud_album_name': self.icloud_album_name,
                 'logged_in': self.loggedin,

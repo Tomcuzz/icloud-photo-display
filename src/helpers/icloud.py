@@ -186,20 +186,6 @@ class ICloud(object):
 
     def sync_photo_album(self):
         """ Download missing photos to local path """
-        for photo in self.api.photos.albums[self.configs.icloud_album_name]:
-            if photo.item_type not in ("image"):
-                continue
-            
-            download_path = paths.local_download_path(photo, "original", self.configs.photo_location)
-            file_exists = os.path.isfile(download_path)
-            if file_exists:
-                # for later: this crashes if download-size medium is specified
-                file_size = os.stat(download_path).st_size
-                version = photo.versions["original"]
-                photo_size = version["size"]
-                if file_size != photo_size:
-                    # Looks like files changed.... delete and recreate
-                    continue
-
-            if not file_exists:
-                self.download_photo(photo, download_path)
+        for photo in self.get_sync_photo_album_status:
+            if photo['status'] == "non-existent":
+                self.download_photo(photo['photo'], photo['local_path'])

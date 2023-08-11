@@ -19,6 +19,7 @@ class ICloud(object):
         if not (self.configs.username != ""):
             return None
 
+        passwd = None
         if password != None:
             passwd = password.strip()
 
@@ -50,9 +51,9 @@ class ICloud(object):
     def is_authed(self) -> bool:
         if not self.api:
             return False
-        elif not has_password:
+        elif not self.has_password:
             return False
-        elif needs_2fa_setup:
+        elif self.needs_2fa_setup:
             return False
         return True
 
@@ -127,7 +128,7 @@ class ICloud(object):
                 photo.created)
             created_date = photo.created
         download_result = download.download_media(
-            self, photo, download_path, download_size
+            self, photo, download_path, "original"
         )
         
         if download_result:
@@ -144,18 +145,51 @@ class ICloud(object):
                     )
             download.set_utime(download_path, created_date)
     
-    def sync_photo_album(self, album_name:str, local_path:str):
-        """ Download missing photos to local path """
-        for photo in self.api.photos.albums[album_name]:
-            download_path = ""
+    @property
+    def get_sync_photo_album_status(self):
+        """ Get photo sync status """
+        photo_status = {}
+        for photo in self.api.photos.albums[self.configs.icloud_album_name]:
             if photo.item_type not in ("image"):
                 continue
             
+            download_path = paths.local_download_path(photo, "original", self.configs.photo_location)
+
+            save_item = {
+                'photo': photo,
+                'local_path': download_path
+            }
+
             file_exists = os.path.isfile(download_path)
             if file_exists:
                 # for later: this crashes if download-size medium is specified
                 file_size = os.stat(download_path).st_size
-                version = photo.versions[download_size]
+                version = photo.versions["original"]
+                photo_size = version["size"]
+                if file_size != photo_size:
+                    # Looks like files changed.... delete and recreate
+                    save_item['status'] = "file-change"
+                else:
+                    save_item['status'] = "file-downloaded"
+
+            if not file_exists:
+                save_item['status'] = "non-existent"
+            
+            photo_status[photo.filename] = save_item
+        return photo_status
+
+    def sync_photo_album(self):
+        """ Download missing photos to local path """
+        for photo in self.api.photos.albums[self.configs.icloud_album_name]:
+            if photo.item_type not in ("image"):
+                continue
+            
+            download_path = paths.local_download_path(photo, "original", self.configs.photo_location)
+            file_exists = os.path.isfile(download_path)
+            if file_exists:
+                # for later: this crashes if download-size medium is specified
+                file_size = os.stat(download_path).st_size
+                version = photo.versions["original"]
                 photo_size = version["size"]
                 if file_size != photo_size:
                     # Looks like files changed.... delete and recreate

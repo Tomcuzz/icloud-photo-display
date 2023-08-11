@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Photo Sync Status{% endblock %}
+{% block sync_status_link_active %}active{% endblock %}
+{% block content %}
+<h2>iCloud Status</h2>
+<table class="table">
+	<thead>
+		<tr>
+			<th scope="col">Name</th>
+			<th scope="col">Status</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+            {% for photo_name, photo_state in ICloud.get_sync_photo_album_status.items() %}
+                <th scope="row">{{ photo_name }}</th>
+                <th scope="row">{{ photo_state['status'] }}</th>
+            {% endfor %}
+		</tr>
+	</tbody>
+</table>
+{% endblock %}

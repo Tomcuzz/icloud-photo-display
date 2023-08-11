@@ -25,7 +25,7 @@ class ICloud(object):
 
         if self.configs.username:
             try:
-                logging.warning('Cookie directory: ' + self.configs.cookie_directory)
+                logging.debug('Cookie directory: ' + self.configs.cookie_directory)
                 self.api = base.PyiCloudService(
                     "com",
                     self.configs.username.strip(),

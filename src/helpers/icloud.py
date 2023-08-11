@@ -34,6 +34,14 @@ class ICloud(object):
                 )
                 if passwd or not utils.password_exists_in_keyring(self.configs.username):
                     utils.store_password_in_keyring(self.configs.username, passwd)
+
+                def error_handler(ex, exception_retries):
+                    if "Invalid global session" in str(ex):
+                        if icloud.api:
+                            icloud.api.authenticate()
+                        logging.error("Session error")
+                self.api.photos.exception_handler = error_handler
+                
                 return self.api
             except exceptions.NoStoredPasswordAvailable:
                 logging.warning('iCloud password not avalible')

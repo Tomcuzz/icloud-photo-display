@@ -82,8 +82,6 @@ def download_response_to_path_dry_run(
 # pylint: disable-msg=too-many-arguments
 def download_media(icloud, photo, download_path, size) -> bool:
     """Download the photo to path, with retries and error handling"""
-
-
     if not mkdirs_local(download_path):
         return False
 
@@ -102,6 +100,8 @@ def download_media(icloud, photo, download_path, size) -> bool:
 
         except (ConnectionError, socket.timeout, PyiCloudAPIResponseError) as ex:
             if "Invalid global session" in str(ex):
+                if icloud.api:
+                    icloud.api.authenticate()
                 logging.error("Session error")
             else:
                 # you end up here when p.e. throttling by Apple happens

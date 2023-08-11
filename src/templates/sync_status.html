@@ -14,7 +14,17 @@
         {% for photo_name, photo_state in ICloud.get_sync_photo_album_status.items() %}
 		    <tr>
                 <th scope="row">{{ photo_name }}</th>
-                <th scope="row">{{ photo_state['status'] }}</th>
+                <th scope="row">
+					{% if photo_state['status'] == "non-existent" %}
+						<span class="badge rounded-pill text-bg-danger">Not Downloaded</span>
+					{% elif photo_state['status'] == "file-downloaded" %}
+						<span class="badge rounded-pill text-bg-success">Downloaded</span>
+					{% elif photo_state['status'] == "file-change" %}
+						<span class="badge rounded-pill text-bg-warning">File Change</span>
+					{% else %}
+						<span class="badge rounded-pill text-bg-secondary">{{ photo_state['status'] }}</span>
+					{% endif %}
+				</th>
             </tr>
         {% endfor %}
 	</tbody>

@@ -1,11 +1,12 @@
 """ iCloud api connection helpers """
-from src.pyicloud_ipd import utils, base, exceptions # pylint: disable=import-error
-from src.helpers.settings import Settings # pylint: disable=import-error
-from src.helpers import exif, download, paths # pylint: disable=import-error
+import os
 import piexif
 import logging
 from piexif._exceptions import InvalidImageDataError
 from tzlocal import get_localzone
+from src.pyicloud_ipd import utils, base, exceptions # pylint: disable=import-error
+from src.helpers.settings import Settings # pylint: disable=import-error
+from src.helpers import exif, download, paths # pylint: disable=import-error
 
 class ICloud(object):
     """ iCloud api connection class """
@@ -24,6 +25,7 @@ class ICloud(object):
 
         if self.configs.username:
             try:
+                logging.warning('Cookie directory: ' + self.configs.cookie_directory)
                 self.api = base.PyiCloudService(
                     "com",
                     self.configs.username.strip(),

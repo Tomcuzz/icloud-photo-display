@@ -11,12 +11,12 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr>
-            {% for photo_name, photo_state in ICloud.get_sync_photo_album_status.items() %}
+        {% for photo_name, photo_state in ICloud.get_sync_photo_album_status.items() %}
+		    <tr>
                 <th scope="row">{{ photo_name }}</th>
                 <th scope="row">{{ photo_state['status'] }}</th>
-            {% endfor %}
-		</tr>
+            </tr>
+        {% endfor %}
 	</tbody>
 </table>
 {% endblock %}

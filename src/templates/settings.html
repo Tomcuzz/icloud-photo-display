@@ -90,13 +90,9 @@
 			<th scope="row">{{ ICloud.has_password }}</th>
 		</tr>
 		<tr>
-			<th scope="row">Authentication Passed</th>
-			<th scope="row">{{ ICloud.auth_passed }}</th>
-		</tr>
-		<tr>
 			<th scope="row"> 2FA Setup</th>
 			<th scope="row">
-				{% if not ICloud.auth_passed %}
+				{% if not ICloud.is_authed %}
 					False
 				{% elif ICloud.needs_2fa_setup %}
 					False
@@ -106,6 +102,10 @@
 					True
 				{% endif %}
 			</th>
+		</tr>
+		<tr>
+			<th scope="row">Authentication Passed</th>
+			<th scope="row">{{ ICloud.is_authed }}</th>
 		</tr>
 	</tbody>
 </table>

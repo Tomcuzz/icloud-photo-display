@@ -12,7 +12,6 @@ class ICloud(object):
     def __init__(self, configs:Settings) -> None:
         self.configs = configs
         self.api = self.setup_api()
-        self.auth_passed = False
 
     def setup_api(self, password=None) -> base.PyiCloudService:
         """ Setup api connection """
@@ -31,15 +30,12 @@ class ICloud(object):
                     passwd,
                     cookie_directory=self.configs.cookie_directory
                 )
-                if not passwd or not utils.password_exists_in_keyring(self.configs.username):
+                if passwd or not utils.password_exists_in_keyring(self.configs.username):
                     utils.store_password_in_keyring(self.configs.username, passwd)
-                self.auth_passed = True
                 return self.api
             except exceptions.NoStoredPasswordAvailable:
-                self.auth_passed = False
                 logging.warning('iCloud password not avalible')
             except exceptions.PyiCloudFailedLoginException:
-                self.auth_passed = False
                 logging.warning('iCloud Login Failed')
         return None
 

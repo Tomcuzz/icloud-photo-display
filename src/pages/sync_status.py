@@ -12,3 +12,12 @@ def add_sync_status_pages(app, icloud_helper:ICloud):
             return render_template('sync_status.html', ICloud=icloud_helper)
         else:
             return redirect(url_for('settings_page'))
+    
+    @app.route("/sync/<string:photname>")
+    def sync_photo_page(photname):
+        """ Sync Photo Page """
+        if photname == "all":
+            icloud_helper.sync_photo_album()
+        else:
+            icloud_helper.sync_photo(photname)
+        return redirect(url_for('sync_status_page'))

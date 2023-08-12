@@ -3,11 +3,13 @@
 {% block sync_status_link_active %}active{% endblock %}
 {% block content %}
 <h2>iCloud Status</h2>
+<a class="btn btn-success" href="/sync/all">Sync All Photos</a>
 <table class="table">
 	<thead>
 		<tr>
 			<th scope="col">Name</th>
 			<th scope="col">Status</th>
+			<th scope="col">Action</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -23,6 +25,11 @@
 						<span class="badge rounded-pill text-bg-warning">File Change</span>
 					{% else %}
 						<span class="badge rounded-pill text-bg-secondary">{{ photo_state['status'] }}</span>
+					{% endif %}
+				</th>
+				<th scope="row">
+					{% if photo_state['status'] == "non-existent" %}
+						<a class="btn btn-success" href="/sync/{{ photo_name }}">Sync</a>
 					{% endif %}
 				</th>
             </tr>

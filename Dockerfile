@@ -9,7 +9,7 @@ COPY /src .
 COPY requirements.txt requirements.txt
 
 # Define environment veriables
-ENV TZ="America/London"
+ENV TZ="Europe/London"
 
 #Make icloud directory
 RUN mkdir /icloudpd

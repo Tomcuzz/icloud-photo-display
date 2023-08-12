@@ -82,14 +82,14 @@ def download_response_to_path_dry_run(
 # pylint: disable-msg=too-many-arguments
 def download_media(icloud, photo, download_path, size) -> bool:
     """Download the photo to path, with retries and error handling"""
-    if not mkdirs_local(download_path):
+    if not mkdirs_for_path(download_path):
         return False
 
     for retries in range(icloud.configs.max_retries):
         try:
             photo_response = photo.download(size)
             if photo_response:
-                return download_local(photo_response, download_path, photo.created)
+                return download_response_to_path(photo_response, download_path, photo.created)
 
             logging.error(
                 "Could not find URL to download %s for size %s",

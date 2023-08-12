@@ -124,7 +124,7 @@ class ICloud(object):
             logging.warning("Photo album list error: " + err)
         return False
     
-    def download_photo(self, photo, path) -> bool:
+    def download_photo(self, photo, download_path) -> bool:
         """ Given a path download a photo from iCloud """
         try:
             created_date = photo.created.astimezone(get_localzone())
@@ -138,14 +138,13 @@ class ICloud(object):
         )
         
         if download_result:
-            if set_exif_datetime and \
-                paths.clean_filename(photo.filename) \
+            if paths.clean_filename(photo.filename) \
                 .lower().endswith((".jpg", ".jpeg")) and \
                 not exif.get_photo_exif(download_path):
                     # %Y:%m:%d looks wrong, but it's the correct format
                     date_str = created_date.strftime(
                         "%Y-%m-%d %H:%M:%S%z")
-                    set_photo_exif(
+                    exif.set_photo_exif(
                         download_path,
                         created_date.strftime("%Y:%m:%d %H:%M:%S"),
                     )
@@ -184,8 +183,16 @@ class ICloud(object):
             photo_status[photo.filename] = save_item
         return photo_status
 
+    def sync_photo(self, name, photos=None):
+        """ Download photo to local path """
+        if photos is None:
+            photos = self.get_sync_photo_album_status
+        if name in photos:
+            if photos[name]['status'] == "non-existent":
+                self.download_photo(photos[name]['photo'], photos[name]['local_path'])
+
     def sync_photo_album(self):
         """ Download missing photos to local path """
-        for photo in self.get_sync_photo_album_status:
-            if photo['status'] == "non-existent":
-                self.download_photo(photo['photo'], photo['local_path'])
+        photos = self.get_sync_photo_album_status
+        for photo in photos.keys():
+            self.sync_photo(photo, photos)

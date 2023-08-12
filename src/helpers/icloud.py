@@ -182,6 +182,15 @@ class ICloud(object):
             
             photo_status[photo.filename] = save_item
         return photo_status
+    
+    def delete_local_photo(self, name) -> bool:
+        photos = self.get_sync_photo_album_status
+        if name in photos:
+            download_path = paths.local_download_path(photos[name]['photo'], "original", self.configs.photo_location)
+            if os.path.exists(download_path):
+                os.remove(download_path)
+                return True
+        return False
 
     def sync_photo(self, name, photos=None):
         """ Download photo to local path """

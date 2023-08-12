@@ -30,6 +30,8 @@
 				<th scope="row">
 					{% if photo_state['status'] == "non-existent" %}
 						<a class="btn btn-success" href="/sync/{{ photo_name }}">Sync</a>
+					{% else %}
+						<a class="btn btn-danger" href="/delete_local/{{ photo_name }}">Delete</a>
 					{% endif %}
 				</th>
             </tr>

@@ -22,9 +22,21 @@ def local_download_path(media, size, download_dir):
 
 
 def filename_with_size(media, size):
-    """Returns the filename with size, e.g. IMG1234.jpg, IMG1234-small.jpg"""
+    """Returns the filename with size, e.g. 12345-IMG1234.jpg, 45678-IMG1234.jpg"""
     # Strip any non-ascii characters.
     filename = clean_filename(media.filename)
-    if size == 'original':
-        return filename
-    return (f"-{size}.").join(filename.rsplit(".", 1))
+    return str(size) + "-" + filename
+
+def get_files_on_disk(photo_dir):
+    to_return = {}
+    for disk_file_name in os.listdir(photo_dir):
+        file_name_components = disk_file_name.split("-")
+        filename = disk_file_name
+        if len(file_name_components) > 1: 
+            filename = "-".join(file_name_components[1:])
+        to_return[filename] = {
+            'size': file_name_components[0],
+            'disk_file_name': disk_file_name,
+            'file_name': filename
+        }
+    return to_return

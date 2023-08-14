@@ -34,19 +34,14 @@ class ICloud(object):
                 )
                 if passwd or not utils.password_exists_in_keyring(self.configs.username):
                     utils.store_password_in_keyring(self.configs.username, passwd)
-
-                def error_handler(ex, exception_retries):
-                    if "Invalid global session" in str(ex):
-                        if icloud.api:
-                            icloud.api.authenticate()
-                        logging.error("Session error")
-                self.api.photos.exception_handler = error_handler
                 
                 return self.api
             except exceptions.NoStoredPasswordAvailable:
                 logging.warning('iCloud password not avalible')
             except exceptions.PyiCloudFailedLoginException:
                 logging.warning('iCloud Login Failed')
+            except exceptions.PyiCloudServiceNotActivatedErrror:
+                logging.warning('iCloud Not Activated')
         return None
 
     def update_login(self, password):
@@ -114,6 +109,7 @@ class ICloud(object):
         """ Check if a given string name is the same as an icloud alum """
         if not self.is_authed:
             return False
+        self.setup_photo_error_handler()
         try:
             albums_dict = self.api.photos.albums
             if name in albums_dict:
@@ -126,6 +122,7 @@ class ICloud(object):
     
     def download_photo(self, photo, download_path) -> bool:
         """ Given a path download a photo from iCloud """
+        self.setup_photo_error_handler()
         try:
             created_date = photo.created.astimezone(get_localzone())
         except (ValueError, OSError):
@@ -138,7 +135,7 @@ class ICloud(object):
         )
         
         if download_result:
-            if paths.clean_filename(photo.filename) \
+            if False and paths.clean_filename(photo.filename) \
                 .lower().endswith((".jpg", ".jpeg")) and \
                 not exif.get_photo_exif(download_path):
                     # %Y:%m:%d looks wrong, but it's the correct format
@@ -150,34 +147,46 @@ class ICloud(object):
                     )
             download.set_utime(download_path, created_date)
     
+    def setup_photo_error_handler(self):
+        if not self.is_authed:
+            return
+        def error_handler(ex, exception_retries):
+            if "Invalid global session" in str(ex):
+                if icloud.api:
+                    self.api.authenticate()
+                logging.error("Session error")
+        self.api.photos.exception_handler = error_handler
+
     @property
-    def get_sync_photo_album_status(self):
+    def get_sync_photo_album_status(self) -> dict:
         """ Get photo sync status """
+        if not self.is_authed:
+            return {}
+        self.setup_photo_error_handler()
         photo_status = {}
+        files_on_disk = paths.get_files_on_disk(self.configs.photo_location)
         for photo in self.api.photos.albums[self.configs.icloud_album_name]:
             if photo.item_type not in ("image"):
                 continue
             
-            download_path = paths.local_download_path(photo, "original", self.configs.photo_location)
+            download_path = paths.local_download_path(photo, photo.versions["original"]["size"], self.configs.photo_location)
 
             save_item = {
                 'photo': photo,
                 'local_path': download_path
             }
 
-            file_exists = os.path.isfile(download_path)
-            if file_exists:
+            if paths.clean_filename(photo.filename) in files_on_disk:
                 # for later: this crashes if download-size medium is specified
-                file_size = os.stat(download_path).st_size
+                file_size = files_on_disk[paths.clean_filename(photo.filename)]['size']
                 version = photo.versions["original"]
                 photo_size = version["size"]
-                if file_size != photo_size:
+                if str(file_size) != str(photo_size):
                     # Looks like files changed.... delete and recreate
                     save_item['status'] = "file-change"
                 else:
                     save_item['status'] = "file-downloaded"
-
-            if not file_exists:
+            else:
                 save_item['status'] = "non-existent"
             
             photo_status[photo.filename] = save_item
@@ -186,7 +195,7 @@ class ICloud(object):
     def delete_local_photo(self, name) -> bool:
         photos = self.get_sync_photo_album_status
         if name in photos:
-            download_path = paths.local_download_path(photos[name]['photo'], "original", self.configs.photo_location)
+            download_path = paths.local_download_path(photos[name]['photo'], photos[name]['photo'].versions["original"]["size"], self.configs.photo_location)
             if os.path.exists(download_path):
                 os.remove(download_path)
                 return True
@@ -194,6 +203,7 @@ class ICloud(object):
 
     def sync_photo(self, name, photos=None):
         """ Download photo to local path """
+        self.setup_photo_error_handler()
         if photos is None:
             photos = self.get_sync_photo_album_status
         if name in photos:
@@ -202,6 +212,7 @@ class ICloud(object):
 
     def sync_photo_album(self):
         """ Download missing photos to local path """
+        self.setup_photo_error_handler()
         photos = self.get_sync_photo_album_status
         for photo in photos.keys():
             self.sync_photo(photo, photos)

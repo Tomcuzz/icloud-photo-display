@@ -48,7 +48,7 @@ def add_settings_pages(app, configs:Settings, icloud_helper:ICloud):
         configs.username = request.form['user']
         configs.save_settings()
         icloud_helper.update_login(request.form['pass'])
-        if not icloud_helper.is_authed:
+        if not icloud_helper.has_password:
             return render_template(
                 'settings.html',
                 Configs=configs,

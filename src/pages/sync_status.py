@@ -9,7 +9,7 @@ def add_sync_status_pages(app, icloud_helper:ICloud):
     def sync_status_page():
         """ Home Page """
         if icloud_helper.is_authed:
-            return render_template('sync_status.html', ICloud=icloud_helper)
+            return render_template('sync_status.html', ICloud_photo_album_status=icloud_helper.get_sync_photo_album_status)
         else:
             return redirect(url_for('settings_page'))
     

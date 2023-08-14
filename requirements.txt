@@ -11,3 +11,4 @@ Flask
 prometheus-client
 requests
 urllib3
+wand

@@ -43,9 +43,9 @@
 </table>
 <br>
 <h2>Icloud Authentication Settings</h2>
-{% if icloud_error %}
+{% if ICloud_error %}
 	<div class="alert alert-danger" role="alert">
-		{{ icloud_error }}
+		{{ ICloud_error }}
 	</div>
 {% endif %}
 <table class="table">
@@ -93,7 +93,7 @@
 		<tr>
 			<th scope="row"> 2FA Setup</th>
 			<th scope="row">
-				{% if not ICloud.is_authed %}
+				{% if not ICloud.has_password %}
 					False
 				{% elif ICloud.needs_2fa_setup %}
 					False

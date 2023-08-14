@@ -15,4 +15,4 @@ def add_home_page(app, app_metrics:Metrics, configs:Settings):
         app_metrics.photo_requests_counter.inc()
         disk_photos = paths.get_files_on_disk(configs.photo_location)
         photo = random.choice(list(disk_photos.keys()))
-        return render_template('home.html', URL=disk_photos[photo]['file_name'])
+        return render_template('home.html', URL=photo)

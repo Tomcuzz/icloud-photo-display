@@ -3,6 +3,6 @@
 {% block home_link_active %}active{% endblock %}
 {% block content %}
 <h1>iCloud Photo Frame</h1>
-<button href="/photo" class="btn btn-success">Full Screen</button>
-<img src="/image/{{ URL }}" onClick="window.location.reload();" style="height:100%; width:100%; display:block; margin-left:auto; margin-right:auto; object-fit: contain;">
+<a class="btn btn-success" href="/photo">Full Screen</a>
+<img src="/photo/{{ URL }}" onClick="window.location.reload();" style="height:100%; width:100%; display:block; margin-left:auto; margin-right:auto; object-fit: contain;">
 {% endblock %}

@@ -32,11 +32,13 @@ def get_files_on_disk(photo_dir):
     for disk_file_name in os.listdir(photo_dir):
         file_name_components = disk_file_name.split("-")
         filename = disk_file_name
+        file_path = photo_dir + '/' + disk_file_name
         if len(file_name_components) > 1: 
             filename = "-".join(file_name_components[1:])
         to_return[filename] = {
             'size': file_name_components[0],
             'disk_file_name': disk_file_name,
+            'file_path': file_path,
             'file_name': filename
         }
     return to_return

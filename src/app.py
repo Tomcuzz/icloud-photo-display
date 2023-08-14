@@ -13,7 +13,7 @@ configs = Settings("/icloudpd", "configs.json")
 prom_metrics = Metrics()
 icloud_helper = ICloud(configs)
 
-home_page.add_home_page(app)
+home_page.add_home_page(app, prom_metrics, configs)
 photo_page.add_photo_page(app, prom_metrics, configs)
 sync_status.add_sync_status_pages(app, icloud_helper)
 settings_page.add_settings_pages(app, configs, icloud_helper)

@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: icloudphoto-deployment
+  namespace: icloudphoto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: icloudphoto-app
+  template:
+    metadata:
+      labels:
+        app: icloudphoto-app
+    spec:
+      containers:
+      - name: icloudphoto-app
+        image: tcousin/icloud-photo-display:latest
+        env:
+        - name: TZ
+          value: Europe/London
+        ports:
+        - containerPort: 5000
+          protocol: TCP
+        volumeMounts:
+        - name: icloudphoto-data
+          mountPath: /icloudpd
+        - name: icloudphoto-keyring
+          mountPath: /root/.local/share/python_keyring
+      volumes:
+      - name: icloudphoto-data
+        persistentVolumeClaim:
+          claimName: icloudphoto-data-pvc
+      - name: icloudphoto-keyring
+          claimName: icloudphoto-keyring-pvc

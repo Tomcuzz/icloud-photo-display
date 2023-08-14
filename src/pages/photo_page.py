@@ -14,7 +14,7 @@ def add_photo_page(app, app_metrics:Metrics, configs:Settings):
     @app.route('/photo/<int:refresh>')
     def photo_page(refresh=900):
         """ Photo Page """
-        app_metrics.photo_requests_counter.inc()
+        app_metrics.counter__requests__photo_page.inc()
         disk_photos = paths.get_files_on_disk(configs.photo_location)
         photo = random.choice(list(disk_photos.keys()))
         return render_template('photo.html', URL=photo)
@@ -22,12 +22,15 @@ def add_photo_page(app, app_metrics:Metrics, configs:Settings):
     @app.route('/photo/<string:filename>')
     def photo_contents(filename=""):
         if filename == "":
+            app_metrics.counter__error__404.inc()
             abort(404)
         disk_photos = paths.get_files_on_disk(configs.photo_location)
         logging.warning(disk_photos[filename]['file_path'])
         if  filename not in disk_photos:
+            app_metrics.counter__error__404.inc()
             abort(404)
         if not os.path.isfile(disk_photos[filename]['file_path']):
+            app_metrics.counter__error__404.inc()
             abort(404)
         filecontent = open(disk_photos[filename]['file_path'], "rb")
         # return filecontent.read()

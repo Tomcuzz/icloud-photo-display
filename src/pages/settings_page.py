@@ -2,8 +2,9 @@
 from flask import render_template, request, redirect, url_for, abort
 from src.helpers.settings import Settings # pylint: disable=import-error
 from src.helpers.icloud import ICloud # pylint: disable=import-error
+from src.helpers.metrics import Metrics # pylint: disable=import-error
 
-def add_settings_pages(app, configs:Settings, icloud_helper:ICloud):
+def add_settings_pages(app, app_metrics:Metrics, configs:Settings, icloud_helper:ICloud):
     """ Add Settings Page """
     @app.route("/settings", methods=['GET', 'POST'])
     def settings_page():

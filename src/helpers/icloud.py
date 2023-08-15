@@ -2,16 +2,19 @@
 import os
 import piexif
 import logging
+from datetime import datetime
 from piexif._exceptions import InvalidImageDataError
 from tzlocal import get_localzone
 from src.pyicloud_ipd import utils, base, exceptions # pylint: disable=import-error
 from src.helpers.settings import Settings # pylint: disable=import-error
+from src.helpers.metrics import Metrics # pylint: disable=import-error
 from src.helpers import exif, download, paths # pylint: disable=import-error
 
 class ICloud(object):
     """ iCloud api connection class """
-    def __init__(self, configs:Settings) -> None:
+    def __init__(self, configs:Settings, metrics:Metrics) -> None:
         self.configs = configs
+        self.metrics = metrics
         self.api = self.setup_api()
 
     def setup_api(self, password=None) -> base.PyiCloudService:
@@ -56,6 +59,8 @@ class ICloud(object):
             return False
         elif self.needs_2fa_setup:
             return False
+        elif self.get_token_exparation < datetime.now():
+            return False
         return True
 
     @property
@@ -74,6 +79,21 @@ class ICloud(object):
         if self.api is None:
             return False
         return self.api.requires_2sa
+    
+    @property
+    def get_token_exparation(self) -> datetime:
+        exparation = datetime.now()
+        if not self.is_authed():
+            return exparation
+        if self.api and self.api.session and self.api.session.cookies:
+            cookie_dict = {c.name: c for c in self.api.session.cookies}
+            if cookie_dict.get("X-APPLE-WEBAUTH-HSA-TRUST"):
+                expires = cookie_dict.get("X-APPLE-WEBAUTH-HSA-TRUST").expires
+                if expires is not None:
+                    exparation = datetime.utcfromtimestamp(expires)
+                    self.metrics.gauge__icloud__token_exparation_epoch.set(expires)
+                    self.metrics.gauge__icloud__token_exparation_seconds.set(expires-datetime.now().timestamp())
+        return exparation
 
     def get_trusted_devices(self) -> list:
         """ List Trused 2fa devices """

@@ -1,6 +1,5 @@
 """Path functions"""
 import os
-from src.helpers import download # pylint: disable=import-error
 
 
 def clean_filename(filename):
@@ -30,7 +29,7 @@ def filename_with_size(media, size):
 
 def get_files_on_disk(photo_dir):
     to_return = {}
-    download.mkdirs_for_path(photo_dir)
+    os.makedirs(name=photo_dir, exist_ok=True)
     for disk_file_name in os.listdir(photo_dir):
         file_name_components = disk_file_name.split("-")
         filename = disk_file_name

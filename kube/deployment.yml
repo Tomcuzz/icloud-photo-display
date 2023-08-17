@@ -32,4 +32,5 @@ spec:
         persistentVolumeClaim:
           claimName: icloudphoto-data-pvc
       - name: icloudphoto-keyring
+        persistentVolumeClaim:
           claimName: icloudphoto-keyring-pvc

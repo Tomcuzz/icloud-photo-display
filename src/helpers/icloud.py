@@ -40,10 +40,13 @@ class ICloud(object):
                 
                 return self.api
             except exceptions.NoStoredPasswordAvailable:
+                self.metrics.counter__icloud__errors.inc()
                 logging.warning('iCloud password not avalible')
             except exceptions.PyiCloudFailedLoginException:
+                self.metrics.counter__icloud__errors.inc()
                 logging.warning('iCloud Login Failed')
             except exceptions.PyiCloudServiceNotActivatedErrror:
+                self.metrics.counter__icloud__errors.inc()
                 logging.warning('iCloud Not Activated')
         return None
 
@@ -84,6 +87,7 @@ class ICloud(object):
     def get_token_exparation(self) -> datetime:
         exparation = datetime.now()
         if not self.is_authed():
+            self.metrics.counter__icloud__errors.inc()
             return exparation
         if self.api and self.api.session and self.api.session.cookies:
             cookie_dict = {c.name: c for c in self.api.session.cookies}
@@ -111,23 +115,27 @@ class ICloud(object):
     def send_2fa_code(self, device_id:int) -> bool:
         """ Request 2fa code send """
         if self.api.trusted_devices is None or len(self.api.trusted_devices) < device_id or device_id < 0:
+            self.metrics.counter__icloud__errors.inc()
             return False
         return self.api.send_verification_code(self.api.trusted_devices[device_id])
 
     def validate_2fa_code(self, device_id:int, code:str) -> bool:
         """ Validate 2fa code """
         if self.api.trusted_devices is None or device_id < 0:
+            self.metrics.counter__icloud__errors.inc()
             return False
         if len(self.api.trusted_devices) == device_id:
             device = {}
             return self.api.validate_verification_code(device, code)
         if len(self.api.trusted_devices) > device_id:
             return self.api.validate_verification_code(self.api.trusted_devices[device_id], code)
+        self.metrics.counter__icloud__errors.inc()
         return False
     
     def photo_album_exists(self, name:str) -> bool:
         """ Check if a given string name is the same as an icloud alum """
         if not self.is_authed:
+            self.metrics.counter__icloud__errors.inc()
             return False
         self.setup_photo_error_handler()
         try:
@@ -135,9 +143,11 @@ class ICloud(object):
             if name in albums_dict:
                 return True
         except PyiCloudAPIResponseError as err:
+            self.metrics.counter__icloud__errors.inc()
             # For later: come up with a nicer message to the user. For now take the
             # exception text
             logging.warning("Photo album list error: " + err)
+        self.metrics.counter__icloud__errors.inc()
         return False
     
     def download_photo(self, photo, download_path) -> bool:
@@ -146,6 +156,7 @@ class ICloud(object):
         try:
             created_date = photo.created.astimezone(get_localzone())
         except (ValueError, OSError):
+            self.metrics.counter__icloud__download_errors.inc()
             logging.error(
                 "Could not convert photo created date to local timezone (%s)",
                 photo.created)
@@ -155,6 +166,7 @@ class ICloud(object):
         )
         
         if download_result:
+            self.metrics.counter__icloud__number_of_files_downloaded.inc()
             if False and paths.clean_filename(photo.filename) \
                 .lower().endswith((".jpg", ".jpeg")) and \
                 not exif.get_photo_exif(download_path):
@@ -166,11 +178,15 @@ class ICloud(object):
                         created_date.strftime("%Y:%m:%d %H:%M:%S"),
                     )
             download.set_utime(download_path, created_date)
+        else:
+            self.metrics.counter__icloud__download_errors.inc()
     
     def setup_photo_error_handler(self):
         if not self.is_authed:
+            self.metrics.counter__icloud__errors.inc()
             return
         def error_handler(ex, exception_retries):
+            self.metrics.counter__icloud__download_errors.inc()
             if "Invalid global session" in str(ex):
                 if icloud.api:
                     self.api.authenticate()
@@ -181,6 +197,7 @@ class ICloud(object):
     def get_sync_photo_album_status(self) -> dict:
         """ Get photo sync status """
         if not self.is_authed:
+            self.metrics.counter__icloud__errors.inc()
             return {}
         self.setup_photo_error_handler()
         photo_status = {}

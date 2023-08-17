@@ -255,5 +255,4 @@ class ICloud(object):
         for photo in photos.keys():
             self.sync_photo(photo, photos)
         end = datetime.now()
-        run_time = end - start
-        self.metrics.gauge__icloud__last_sync_elapse_time.set(run_time.total_seconds())
+        self.labels(SyncName='').metrics.gauge__icloud__last_sync_elapse_time.set((end - start).total_seconds())

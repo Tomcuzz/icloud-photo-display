@@ -10,7 +10,7 @@ class Metrics(object):
         self.gauge__icloud__last_sync_seconds = Gauge("icloud_last_sync_seconds", "Number of seconds since the last sync")
         self.gauge__icloud__tlast_sync_epoch = Gauge("icloud_last_sync_epoch", "Epoch since the last sync")
 
-        self.gauge__icloud__last_sync_elapse_time = Gauge("icloud_last_sync_elapse_time", "Number of seconds the last sync took")
+        self.gauge__icloud__last_sync_elapse_time = Gauge("icloud_sync_elapse_time", "Number of seconds the sync took")
         self.counter__icloud__number_of_files_downloaded = Counter("icloud_number_of_files_downloaded", "Number of files the sync downloaded")
         self.counter__icloud__download_errors = Counter("icloud_download_errors", "Number of download errors encountered")
         self.counter__icloud__errors = Counter("icloud_errors", "Number of errors encountered")

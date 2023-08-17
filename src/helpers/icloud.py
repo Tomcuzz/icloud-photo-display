@@ -249,7 +249,11 @@ class ICloud(object):
 
     def sync_photo_album(self):
         """ Download missing photos to local path """
+        start = datetime.now()
         self.setup_photo_error_handler()
         photos = self.get_sync_photo_album_status
         for photo in photos.keys():
             self.sync_photo(photo, photos)
+        end = datetime.now()
+        run_time = end - start
+        self.metrics.gauge__icloud__last_sync_elapse_time.set(run_time.total_seconds())

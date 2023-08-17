@@ -12,7 +12,7 @@ def add_home_page(app, app_metrics:Metrics, configs:Settings):
     @app.route("/")
     def home_page():
         """ Home Page """
-        app_metrics.photo_requests_counter.inc()
+        app_metrics.counter__requests__photo_page.inc()
         disk_photos = paths.get_files_on_disk(configs.photo_location)
         photo = random.choice(list(disk_photos.keys()))
         return render_template('home.html', URL=photo)

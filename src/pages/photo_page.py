@@ -15,9 +15,12 @@ def add_photo_page(app, app_metrics:Metrics, configs:Settings):
     def photo_page(refresh=900):
         """ Photo Page """
         app_metrics.counter__requests__photo_page.inc()
-        disk_photos = paths.get_files_on_disk(configs.photo_location)
-        photo = random.choice(list(disk_photos.keys()))
-        return render_template('photo.html', URL=photo)
+        try:
+            disk_photos = paths.get_files_on_disk(configs.photo_location)
+            photo = random.choice(list(disk_photos.keys()))
+            return render_template('photo.html', URL=photo)
+        except:
+            return render_template('home.html', URL="")
 
     @app.route('/photo/<string:filename>')
     def photo_contents(filename=""):

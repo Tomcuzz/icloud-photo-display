@@ -86,7 +86,7 @@ class ICloud(object):
     @property
     def get_token_exparation(self) -> datetime:
         exparation = datetime.now()
-        if not self.is_authed():
+        if not self.is_authed:
             self.metrics.counter__icloud__errors.inc()
             return exparation
         if self.api and self.api.session and self.api.session.cookies:

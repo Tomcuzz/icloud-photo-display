@@ -92,13 +92,17 @@ class ICloud(object):
         elif not self.has_password:
             self.metrics.counter__icloud__errors.inc()
             return exparation
-        elif not self.needs_2fa_setup:
+        elif self.needs_2fa_setup:
             self.metrics.counter__icloud__errors.inc()
             return exparation
         if self.api and self.api.session and self.api.session.cookies:
             cookie_dict = {c.name: c for c in self.api.session.cookies}
-            if cookie_dict.get("X-APPLE-WEBAUTH-HSA-TRUST"):
-                expires = cookie_dict.get("X-APPLE-WEBAUTH-HSA-TRUST").expires
+            trust_key = ""
+            for key in cookie_dict.keys():
+                if key.startswith("X-APPLE-WEBAUTH-HSA-TRUST"):
+                    trust_key = key
+            if trust_key != "":
+                expires = cookie_dict.get(trust_key).expires
                 if expires is not None:
                     exparation = datetime.utcfromtimestamp(expires)
                     self.metrics.gauge__icloud__token_exparation_epoch.set(expires)

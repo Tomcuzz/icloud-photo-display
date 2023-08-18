@@ -4,7 +4,7 @@ from threading import Thread, Lock
 from src.helpers.icloud import ICloud # pylint: disable=import-error
 from src.helpers.settings import Settings # pylint: disable=import-error
 
-class SyncThreadHandler(object):
+class SyncHandler(object):
     def __init__(self, configs:Settings, icloud:ICloud):
         self.sync_runner = SyncThread(icloud)
         self.sync_trigger = PeriodicSyncFire(configs, self)
@@ -18,9 +18,12 @@ class SyncThreadHandler(object):
             return True
         else:
             return False
+    
+    def sync_running(self) -> bool:
+        return self.sync_runner.is_alive()
 
 class PeriodicSyncFire(Thread):
-    def __init__(self, configs:Settings, sync_handler:SyncThreadHandler):
+    def __init__(self, configs:Settings, sync_handler:SyncHandler):
         super().__init__()
         self.configs = configs
         self.sync_handler = sync_handler

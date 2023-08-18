@@ -1,15 +1,16 @@
 """ Code to home web page """
 from flask import render_template, redirect, url_for
 from src.helpers.icloud import ICloud # pylint: disable=import-error
+from src.helpers.sync_thread import SyncHandler # pylint: disable=import-error
 
 
-def add_sync_status_pages(app, icloud_helper:ICloud):
+def add_sync_status_pages(app, icloud_helper:ICloud, sync_handler:SyncHandler):
     """ Add Home Page """
     @app.route("/sync-status")
     def sync_status_page():
         """ Home Page """
         if icloud_helper.is_authed:
-            return render_template('sync_status.html', ICloud_photo_album_status=icloud_helper.get_sync_photo_album_status)
+            return render_template('sync_status.html', ICloud_photo_album_status=icloud_helper.get_sync_photo_album_status, Sync_Running=sync_handler.sync_running())
         else:
             return redirect(url_for('settings_page'))
     
@@ -17,6 +18,7 @@ def add_sync_status_pages(app, icloud_helper:ICloud):
     def sync_photo_page(photname):
         """ Sync Photo Page """
         if photname == "all":
+            sync_handler.start_sync_if_not_running()
             icloud_helper.sync_photo_album()
         else:
             icloud_helper.sync_photo(photname)

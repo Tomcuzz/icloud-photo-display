@@ -1,5 +1,5 @@
 from time import sleep
-from threading import Thread
+from threading import Thread, Lock
 from src.helpers.icloud import ICloud # pylint: disable=import-error
 from src.helpers.settings import Settings # pylint: disable=import-error
 
@@ -29,7 +29,7 @@ class PeriodicSyncFire(Thread):
 class SyncThread(Thread):
     def __init__(self, icloud:ICloud):
         super().__init__()
-        self.sync_lock = threading.Lock()
+        self.sync_lock = Lock()
         self.icloud_connection = icloud
 
     def run(self):

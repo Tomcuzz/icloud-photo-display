@@ -9,6 +9,7 @@ from src.pages import settings_page
 from src.helpers.settings import Settings
 from src.helpers.metrics import Metrics
 from src.helpers.icloud import ICloud
+from src.helpers.sync_thread import SyncThreadHandler
 
 app = Flask(__name__)
 configs = Settings("/icloudpd", "configs.json")

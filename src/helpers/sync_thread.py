@@ -5,13 +5,13 @@ from src.helpers.settings import Settings # pylint: disable=import-error
 
 class SyncThreadHandler(object):
     def __init__(self, configs:Settings, icloud:ICloud):
-        self.sync_runner = SyncThread()
+        self.sync_runner = SyncThread(icloud)
         self.sync_trigger = PeriodicSyncFire(configs, self)
         self.sync_trigger.start()
 
     def start_sync(self):
         if not self.sync_runner.sync_lock.locked():
-            self.sync_runner.run()
+            self.sync_runner.start()
 
 class PeriodicSyncFire(Thread):
     def __init__(self, configs:Settings, sync_handler:SyncThreadHandler):

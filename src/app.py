@@ -19,7 +19,7 @@ sync_handler = SyncHandler(configs, icloud_helper)
 
 home_page.add_home_page(app, prom_metrics, configs)
 photo_page.add_photo_page(app, prom_metrics, configs)
-sync_status.add_sync_status_pages(app, icloud_helpe, icloud_helperr)
+sync_status.add_sync_status_pages(app, icloud_helper, sync_handler)
 settings_page.add_settings_pages(app, prom_metrics, configs)
 
 # Add prometheus wsgi middleware to route /metrics requests

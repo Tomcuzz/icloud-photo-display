@@ -21,9 +21,9 @@ class PeriodicSyncFire(Thread):
     
     def run(self):
         while True:
-            if self.configs.watch_interval > 0:
+            if int(self.configs.watch_interval) > 0:
                 self.sync_handler.start_sync()
-                sleep(self.configs.watch_interval)
+                sleep(int(self.configs.watch_interval))
 
 
 class SyncThread(Thread):

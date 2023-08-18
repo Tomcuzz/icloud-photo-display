@@ -11,9 +11,8 @@ class SyncHandler(object):
         self.sync_trigger.start()
 
     def start_sync_if_not_running(self) -> bool:
-        logging.warning("checking if sync alive")
         if not self.sync_runner.is_alive():
-            logging.warning("triggering sync")
+            self.sync_trigger = PeriodicSyncFire(configs, self)
             self.sync_runner.start()
             return True
         else:

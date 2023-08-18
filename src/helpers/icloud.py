@@ -115,8 +115,8 @@ class ICloud(object):
 
         if self.last_sync != None:
             for key in self.last_sync.keys():
-                self.labels.labels(SyncName=key).metrics.gauge__icloud__last_sync_epoch.set(self.last_sync[key].timestamp())
-                self.labels.labels(SyncName=key).metrics.gauge__icloud__last_sync_seconds.set((datetime.now() - self.last_sync[key]).total_seconds())
+                self.metrics.gauge__icloud__last_sync_epoch.labels(SyncName=key).set(self.last_sync[key].timestamp())
+                self.metrics.gauge__icloud__last_sync_seconds.labels(SyncName=key).set((datetime.now() - self.last_sync[key]).total_seconds())
 
     def get_trusted_devices(self) -> list:
         """ List Trused 2fa devices """
@@ -275,7 +275,7 @@ class ICloud(object):
             self.sync_photo(photo, photos)
         album_name = self.configs.icloud_album_name
         self.last_sync[album_name] = datetime.now()
-        self.metrics.labels(SyncName=album_name).metrics.gauge__icloud__last_sync_elapse_time.set((self.last_sync[album_name] - start).total_seconds())
+        self.metrics.metrics.gauge__icloud__last_sync_elapse_time.labels(SyncName=album_name).set((self.last_sync[album_name] - start).total_seconds())
         self.run_metric_collect()
     
     def sync(self):

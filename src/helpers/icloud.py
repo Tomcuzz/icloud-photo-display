@@ -16,6 +16,7 @@ class ICloud(object):
         self.configs = configs
         self.metrics = metrics
         self.api = self.setup_api()
+        self.last_sync = {}
 
     def setup_api(self, password=None) -> base.PyiCloudService:
         """ Setup api connection """
@@ -62,8 +63,7 @@ class ICloud(object):
             return False
         elif self.needs_2fa_setup:
             return False
-        elif self.get_token_exparation < datetime.now():
-            return False
+        self.run_metric_collect()
         return True
 
     @property
@@ -85,7 +85,7 @@ class ICloud(object):
     
     @property
     def get_token_exparation(self) -> datetime:
-        exparation = datetime.now()
+        exparation = None
         if not self.api:
             self.metrics.counter__icloud__errors.inc()
             return exparation
@@ -105,9 +105,18 @@ class ICloud(object):
                 expires = cookie_dict.get(trust_key).expires
                 if expires is not None:
                     exparation = datetime.utcfromtimestamp(expires)
-                    self.metrics.gauge__icloud__token_exparation_epoch.set(expires)
-                    self.metrics.gauge__icloud__token_exparation_seconds.set(expires-datetime.now().timestamp())
         return exparation
+    
+    def run_metric_collect(self):
+        token_exparation = self.get_token_exparation
+        if token_exparation is not None:
+            self.metrics.gauge__icloud__token_exparation_epoch.set(expires.timestamp())
+            self.metrics.gauge__icloud__token_exparation_seconds.set(expires - datetime.now().total_seconds())
+
+        if self.last_sync != None:
+            for key in self.last_sync.keys():
+                self.labels(SyncName=key).metrics.gauge__icloud__last_sync_epoch.set(self.last_sync[key].timestamp())
+                self.labels(SyncName=key).metrics.gauge__icloud__last_sync_seconds.set((datetime.now() - self.last_sync[key]).total_seconds())
 
     def get_trusted_devices(self) -> list:
         """ List Trused 2fa devices """
@@ -264,5 +273,7 @@ class ICloud(object):
         photos = self.get_sync_photo_album_status
         for photo in photos.keys():
             self.sync_photo(photo, photos)
-        end = datetime.now()
-        self.labels(SyncName='').metrics.gauge__icloud__last_sync_elapse_time.set((end - start).total_seconds())
+        album_name = self.configs.icloud_album_name
+        self.last_sync[album_name] = datetime.now()
+        self.labels(SyncName=album_name).metrics.gauge__icloud__last_sync_elapse_time.set((self.last_sync[album_name] - start).total_seconds())
+        self.run_metric_collect()

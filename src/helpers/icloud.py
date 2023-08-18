@@ -110,8 +110,8 @@ class ICloud(object):
     def run_metric_collect(self):
         token_exparation = self.get_token_exparation
         if token_exparation is not None:
-            self.metrics.gauge__icloud__token_exparation_epoch.set(expires.timestamp())
-            self.metrics.gauge__icloud__token_exparation_seconds.set(expires - datetime.now().total_seconds())
+            self.metrics.gauge__icloud__token_exparation_epoch.set(token_exparation.timestamp())
+            self.metrics.gauge__icloud__token_exparation_seconds.set(token_exparation - datetime.now().total_seconds())
 
         if self.last_sync != None:
             for key in self.last_sync.keys():

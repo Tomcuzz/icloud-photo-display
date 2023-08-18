@@ -14,6 +14,7 @@ app = Flask(__name__)
 configs = Settings("/icloudpd", "configs.json")
 prom_metrics = Metrics()
 icloud_helper = ICloud(configs, prom_metrics)
+sync_handler = SyncThreadHandler(configs, icloud_helper)
 
 home_page.add_home_page(app, prom_metrics, configs)
 photo_page.add_photo_page(app, prom_metrics, configs)

@@ -8,12 +8,13 @@ class SyncHandler(object):
     def __init__(self, configs:Settings, icloud:ICloud):
         self.sync_runner = SyncThread(icloud)
         self.configs = configs
+        self.icloud = icloud
         self.sync_trigger = PeriodicSyncFire(self.configs, self)
         self.sync_trigger.start()
 
     def start_sync_if_not_running(self) -> bool:
         if not self.sync_runner.is_alive():
-            self.sync_runner = SyncThread(self.configs)
+            self.sync_runner = SyncThread(self.icloud)
             self.sync_runner.start()
             return True
         else:

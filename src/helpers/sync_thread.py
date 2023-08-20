@@ -8,7 +8,7 @@ class SyncHandler(object):
     def __init__(self, configs:Settings, icloud:ICloud):
         self.configs = configs
         self.icloud = icloud
-        self.sync_runner = SyncThread(icloud)
+        self.sync_runner = SyncThread(self.icloud)
         self.sync_trigger = PeriodicSyncFire(self.configs, self)
         self.sync_trigger.start()
 

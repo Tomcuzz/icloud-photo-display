@@ -161,7 +161,7 @@ class ICloud(object):
             albums_dict = self.api.photos.albums
             if name in albums_dict:
                 return True
-        except PyiCloudAPIResponseError as err:
+        except exceptions.PyiCloudAPIResponseError as err:
             self.metrics.counter__icloud__errors.inc()
             # For later: come up with a nicer message to the user. For now take the
             # exception text
@@ -221,31 +221,41 @@ class ICloud(object):
         self.setup_photo_error_handler()
         photo_status = {}
         files_on_disk = paths.get_files_on_disk(self.configs.photo_location)
-        for photo in self.api.photos.albums[self.configs.icloud_album_name]:
-            if photo.item_type not in ("image"):
-                continue
-            
-            download_path = paths.local_download_path(photo, photo.versions["original"]["size"], self.configs.photo_location)
+        for i in range(3):
+            try:
+                for photo in self.api.photos.albums[self.configs.icloud_album_name]:
+                    if photo.item_type not in ("image"):
+                        continue
+                    
+                    download_path = paths.local_download_path(photo, photo.versions["original"]["size"], self.configs.photo_location)
 
-            save_item = {
-                'photo': photo,
-                'local_path': download_path
-            }
+                    save_item = {
+                        'photo': photo,
+                        'local_path': download_path
+                    }
 
-            if paths.clean_filename(photo.filename) in files_on_disk:
-                # for later: this crashes if download-size medium is specified
-                file_size = files_on_disk[paths.clean_filename(photo.filename)]['size']
-                version = photo.versions["original"]
-                photo_size = version["size"]
-                if str(file_size) != str(photo_size):
-                    # Looks like files changed.... delete and recreate
-                    save_item['status'] = "file-change"
+                    if paths.clean_filename(photo.filename) in files_on_disk:
+                        # for later: this crashes if download-size medium is specified
+                        file_size = files_on_disk[paths.clean_filename(photo.filename)]['size']
+                        version = photo.versions["original"]
+                        photo_size = version["size"]
+                        if str(file_size) != str(photo_size):
+                            # Looks like files changed.... delete and recreate
+                            save_item['status'] = "file-change"
+                        else:
+                            save_item['status'] = "file-downloaded"
+                    else:
+                        save_item['status'] = "non-existent"
+                    
+                    photo_status[photo.filename] = save_item
+            except exceptions.PyiCloudAPIResponseError as err:
+                self.metrics.counter__icloud__errors.inc()
+                if "Invalid global session" in str(ex):
+                    if icloud.api:
+                        self.api.authenticate()
+                    logging.error("Session error")
                 else:
-                    save_item['status'] = "file-downloaded"
-            else:
-                save_item['status'] = "non-existent"
-            
-            photo_status[photo.filename] = save_item
+                    logging.error("iCloud API error: " + err)
         return photo_status
     
     def delete_local_photo(self, name) -> bool:

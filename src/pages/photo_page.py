@@ -41,8 +41,8 @@ def add_photo_page(app, app_metrics:Metrics, configs:Settings):
 
         # with Image(filename=filepath) as img:
         #     return send_file(img.make_blob('jpeg'))
-        
-        with Image(filename=filepath) as img:
+
+        with Image(filename=disk_photos[filename]['file_path']) as img:
             return send_file(
                 io.BytesIO(img.make_blob('jpeg')),
                 mimetype='image/jpeg',

@@ -13,7 +13,7 @@ class SyncHandler(object):
 
     def start_sync_if_not_running(self) -> bool:
         if not self.sync_runner.is_alive():
-            self.sync_trigger = PeriodicSyncFire(self.configs, self)
+            self.sync_runner = SyncThread(self.configs)
             self.sync_runner.start()
             return True
         else:

@@ -37,6 +37,14 @@ def add_photo_page(app, app_metrics:Metrics, configs:Settings):
             abort(404)
         filecontent = open(disk_photos[filename]['file_path'], "rb")
         # return filecontent.read()
-        return send_file(filecontent, download_name=filename)
+        # return send_file(filecontent, download_name=filename)
+
         # with Image(filename=filepath) as img:
         #     return send_file(img.make_blob('jpeg'))
+        
+        with Image(filename=filepath) as img:
+            return send_file(
+                io.BytesIO(img.make_blob('jpeg')),
+                mimetype='image/jpeg',
+                as_attachment=True,
+                download_name='%s.jpg' % filepath)

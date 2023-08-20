@@ -1,5 +1,6 @@
 """ Code to photo web page """
 import os
+import io
 import random
 import logging
 from flask import render_template, abort, send_file

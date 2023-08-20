@@ -6,9 +6,9 @@ from src.helpers.settings import Settings # pylint: disable=import-error
 
 class SyncHandler(object):
     def __init__(self, configs:Settings, icloud:ICloud):
-        self.sync_runner = SyncThread(icloud)
         self.configs = configs
         self.icloud = icloud
+        self.sync_runner = SyncThread(icloud)
         self.sync_trigger = PeriodicSyncFire(self.configs, self)
         self.sync_trigger.start()
 

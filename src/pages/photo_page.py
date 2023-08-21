@@ -47,5 +47,5 @@ def add_photo_page(app, app_metrics:Metrics, configs:Settings):
             return send_file(
                 io.BytesIO(img.make_blob('jpeg')),
                 mimetype='image/jpeg',
-                as_attachment=True,
+                as_attachment=False,
                 download_name='%s.jpg' % disk_photos[filename]['file_name'])

@@ -250,7 +250,7 @@ class ICloud(object):
                     photo_status[photo.filename] = save_item
             except exceptions.PyiCloudAPIResponseError as err:
                 self.metrics.counter__icloud__errors.inc()
-                if "Invalid global session" in str(ex):
+                if "Invalid global session" in str(err):
                     if icloud.api:
                         self.api.authenticate()
                     logging.error("Session error")

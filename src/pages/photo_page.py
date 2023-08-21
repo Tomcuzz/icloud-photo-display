@@ -29,20 +29,12 @@ def add_photo_page(app, app_metrics:Metrics, configs:Settings):
             app_metrics.counter__error__404.inc()
             abort(404)
         disk_photos = paths.get_files_on_disk(configs.photo_location)
-        logging.warning(disk_photos[filename]['file_path'])
         if  filename not in disk_photos:
             app_metrics.counter__error__404.inc()
             abort(404)
         if not os.path.isfile(disk_photos[filename]['file_path']):
             app_metrics.counter__error__404.inc()
             abort(404)
-        filecontent = open(disk_photos[filename]['file_path'], "rb")
-        # return filecontent.read()
-        # return send_file(filecontent, download_name=filename)
-
-        # with Image(filename=filepath) as img:
-        #     return send_file(img.make_blob('jpeg'))
-
         with Image(filename=disk_photos[filename]['file_path']) as img:
             return send_file(
                 io.BytesIO(img.make_blob('jpeg')),

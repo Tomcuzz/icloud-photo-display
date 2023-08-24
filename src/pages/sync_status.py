@@ -5,7 +5,7 @@ from src.helpers.sync_thread import SyncHandler # pylint: disable=import-error
 from src.helpers.settings import Settings
 
 
-def add_sync_status_pages(app, icloud_helper:ICloud, configs:Settings sync_handler:SyncHandler):
+def add_sync_status_pages(app, icloud_helper:ICloud, configs:Settings, sync_handler:SyncHandler):
     """ Add Home Page """
     @app.route("/sync-status")
     def sync_status_page():

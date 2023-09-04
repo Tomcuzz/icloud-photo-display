@@ -1,15 +1,15 @@
 from time import sleep
 import logging
 from threading import Thread, Lock
+from src.helpers.app import AppHelper # pylint: disable=import-error
 from src.helpers.icloud import ICloud # pylint: disable=import-error
 from src.helpers.settings import Settings # pylint: disable=import-error
 
 class SyncHandler(object):
-    def __init__(self, configs:Settings, icloud:ICloud):
-        self.configs = configs
-        self.icloud = icloud
-        self.sync_runner = SyncThread(self.icloud)
-        self.sync_trigger = PeriodicSyncFire(self.configs, self)
+    def __init__(self, app:AppHelper):
+        self.app = app
+        self.sync_runner = SyncThread(self.app.icloud)
+        self.sync_trigger = PeriodicSyncFire(self.app.configs, self)
         self.sync_trigger.start()
 
     def start_sync_if_not_running(self) -> bool:
@@ -26,20 +26,21 @@ class SyncHandler(object):
 class PeriodicSyncFire(Thread):
     def __init__(self, configs:Settings, sync_handler:SyncHandler):
         super().__init__()
-        self.configs = configs
+        self.app.configs = configs
         self.sync_handler = sync_handler
     
     def run(self):
         while True:
-            if int(self.configs.watch_interval) > 0:
+            if int(self.app.configs.watch_interval) > 0:
                 self.sync_handler.start_sync_if_not_running()
-                sleep(int(self.configs.watch_interval))
+                sleep(int(self.app.configs.watch_interval))
 
 
 class SyncThread(Thread):
-    def __init__(self, icloud:ICloud):
+    def __init__(self, app:AppHelper):
         super().__init__()
-        self.icloud_connection = icloud
+        self.app.renew_icloud()
+        self.icloud_connection = self.app.icloud
 
     def run(self):
         logging.warning("starting sync")

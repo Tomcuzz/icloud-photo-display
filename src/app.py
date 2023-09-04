@@ -6,21 +6,16 @@ from src.pages import home_page
 from src.pages import photo_page
 from src.pages import sync_status
 from src.pages import settings_page
-from src.helpers.settings import Settings
-from src.helpers.metrics import Metrics
-from src.helpers.icloud import ICloud
-from src.helpers.sync_thread import SyncHandler
+from src.helpers.app import AppHelper
 
 app = Flask(__name__)
-configs = Settings("/icloudpd", "configs.json")
-prom_metrics = Metrics()
-icloud_helper = ICloud(configs, prom_metrics)
-sync_handler = SyncHandler(configs, icloud_helper)
 
-home_page.add_home_page(app, prom_metrics, configs)
-photo_page.add_photo_page(app, prom_metrics, configs)
-sync_status.add_sync_status_pages(app, icloud_helper, configs, sync_handler)
-settings_page.add_settings_pages(app, prom_metrics, configs, icloud_helper)
+app_helper = AppHelper()
+
+home_page.add_home_page(app, app_helper.prom_metrics, app_helper.configs)
+photo_page.add_photo_page(app, app_helper.prom_metrics, app_helper.configs)
+sync_status.add_sync_status_pages(app, app_helper.icloud_helper, app_helper.configs, app_helper.sync_handler)
+settings_page.add_settings_pages(app, app_helper.prom_metrics, app_helper.configs, app_helper.icloud_helper)
 
 # Add prometheus wsgi middleware to route /metrics requests
 app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {

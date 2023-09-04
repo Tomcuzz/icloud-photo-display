@@ -9,7 +9,7 @@ class AppHelper(object):
         self.prom_metrics = Metrics()
         self.configs = Settings("/icloudpd", "configs.json")
         self.icloud_helper = ICloud(self.configs, self.prom_metrics)
-        self.sync_handler = SyncHandler(self.configs, self.icloud_helper)
+        self.sync_handler = SyncHandler(self)
     
     def renew_icloud(self):
         self.icloud_helper = ICloud(self.configs, self.prom_metrics)

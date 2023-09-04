@@ -40,7 +40,7 @@ class SyncThread(Thread):
     def __init__(self, app:AppHelper):
         super().__init__()
         self.app.renew_icloud()
-        self.icloud_connection = self.app.icloud
+        self.icloud_connection = self.app.icloud_helper
 
     def run(self):
         logging.warning("starting sync")

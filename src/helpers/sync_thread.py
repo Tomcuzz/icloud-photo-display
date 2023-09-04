@@ -8,13 +8,13 @@ from src.helpers.settings import Settings # pylint: disable=import-error
 class SyncHandler(object):
     def __init__(self, app:AppHelper):
         self.app = app
-        self.sync_runner = SyncThread(self.app.icloud)
+        self.sync_runner = SyncThread(self.app.icloud_helper)
         self.sync_trigger = PeriodicSyncFire(self.app.configs, self)
         self.sync_trigger.start()
 
     def start_sync_if_not_running(self) -> bool:
         if not self.sync_runner.is_alive():
-            self.sync_runner = SyncThread(self.icloud)
+            self.sync_runner = SyncThread(self.app.icloud_helper)
             self.sync_runner.start()
             return True
         else:
@@ -39,10 +39,10 @@ class PeriodicSyncFire(Thread):
 class SyncThread(Thread):
     def __init__(self, app:AppHelper):
         super().__init__()
+        self.app = app
         self.app.renew_icloud()
-        self.icloud_connection = self.app.icloud_helper
 
     def run(self):
         logging.warning("starting sync")
-        self.icloud_connection.sync()
+        self.app.icloud_helper.sync()
         logging.warning("finished sync")

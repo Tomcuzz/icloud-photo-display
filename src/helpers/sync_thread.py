@@ -26,14 +26,14 @@ class SyncHandler(object):
 class PeriodicSyncFire(Thread):
     def __init__(self, configs:Settings, sync_handler:SyncHandler):
         super().__init__()
-        self.app.configs = configs
+        self.configs = configs
         self.sync_handler = sync_handler
     
     def run(self):
         while True:
-            if int(self.app.configs.watch_interval) > 0:
+            if int(self.configs.watch_interval) > 0:
                 self.sync_handler.start_sync_if_not_running()
-                sleep(int(self.app.configs.watch_interval))
+                sleep(int(self.configs.watch_interval))
 
 
 class SyncThread(Thread):

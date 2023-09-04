@@ -12,4 +12,5 @@ class AppHelper(object):
         self.sync_handler = SyncHandler(self)
     
     def renew_icloud(self):
+        from src.helpers.icloud import ICloud
         self.icloud_helper = ICloud(self.configs, self.prom_metrics)

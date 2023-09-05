@@ -1,4 +1,5 @@
 """ Code to run icloud photo display """
+import logging
 from flask import Flask
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from prometheus_client import make_wsgi_app

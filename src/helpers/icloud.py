@@ -209,7 +209,7 @@ class ICloud(object):
             if "Invalid global session" in str(ex):
                 if icloud.api:
                     self.api.authenticate()
-                logging.error("Session error")
+                logging.error("Photo Download Session error")
         self.api.photos.exception_handler = error_handler
 
     @property
@@ -253,7 +253,7 @@ class ICloud(object):
                 if "Invalid global session" in str(err):
                     if self.api:
                         self.api.authenticate()
-                    logging.error("Session error")
+                    logging.error("Photo List Get Session error")
                 else:
                     logging.error("iCloud API error: " + err)
         return photo_status

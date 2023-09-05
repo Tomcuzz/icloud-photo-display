@@ -16,7 +16,6 @@ class ICloud(object):
         self.configs = configs
         self.metrics = metrics
         self.api = self.setup_api()
-        self.last_sync = {}
 
     def setup_api(self, password=None) -> base.PyiCloudService:
         """ Setup api connection """
@@ -111,10 +110,6 @@ class ICloud(object):
         token_exparation = self.get_token_exparation
         if token_exparation is not None:
             self.metrics.gauge__icloud__token_exparation_epoch.set(token_exparation.timestamp())
-
-        if self.last_sync != None:
-            for key in self.last_sync.keys():
-                self.metrics.gauge__icloud__last_sync_epoch.labels(SyncName=key).set(self.last_sync[key].timestamp())
 
     def get_trusted_devices(self) -> list:
         """ List Trused 2fa devices """
@@ -289,8 +284,9 @@ class ICloud(object):
         for photo in photos.keys():
             self.sync_photo(photo, photos)
         album_name = self.configs.icloud_album_name
-        self.last_sync[album_name] = datetime.now()
-        self.metrics.gauge__icloud__last_sync_elapse_time.labels(SyncName=album_name).set((self.last_sync[album_name] - start).total_seconds())
+        end = datetime.now()
+        self.metrics.gauge__icloud__last_sync_elapse_time.labels(SyncName=album_name).set((end - start).total_seconds())
+        self.metrics.gauge__icloud__last_sync_epoch.labels(SyncName=album_name).set(end.timestamp())
         self.run_metric_collect()
     
     def sync(self):

@@ -32,6 +32,7 @@ from src.pyicloud_ipd.utils import get_password_from_keyring
 
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 class PyiCloudPasswordFilter(logging.Filter):

@@ -209,8 +209,15 @@ class ICloud(object):
             if "Invalid global session" in str(ex):
                 if icloud.api:
                     self.api.authenticate()
-                logging.error("Photo Download Session error")
-        self.api.photos.exception_handler = error_handler
+                logging.error("Photo Handler Session error")
+            else:
+                logging.error("Photo Handler iCloud API error: " + err)
+        try:
+            self.api.photos.exception_handler = error_handler
+        except exceptions.PyiCloudAPIResponseError as err:
+            self.metrics.counter__icloud__errors.inc()
+            logging.error("Photo Handler Setup error: " + err)
+            error_handler(err, 0)
 
     @property
     def get_sync_photo_album_status(self) -> dict:

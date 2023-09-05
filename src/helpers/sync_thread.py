@@ -34,7 +34,7 @@ class PeriodicSyncFire(Thread):
         while True:
             if int(self.app.configs.watch_interval) > 0:
                 self.sync_handler.start_sync_if_not_running()
-                self.app.prom_metrics.gauge__icloud__next_sync_epoch.labels(SyncName=self.app.configs.icloud_album_name).set(datetime.now().timestamp())
+                self.app.prom_metrics.gauge__icloud__next_sync_epoch.labels(SyncName=self.app.configs.icloud_album_name).set((datetime.now().timestamp() + self.app.configs.watch_interval))
                 sleep(int(self.app.configs.watch_interval))
 
 

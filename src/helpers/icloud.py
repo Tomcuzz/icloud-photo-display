@@ -111,12 +111,10 @@ class ICloud(object):
         token_exparation = self.get_token_exparation
         if token_exparation is not None:
             self.metrics.gauge__icloud__token_exparation_epoch.set(token_exparation.timestamp())
-            self.metrics.gauge__icloud__token_exparation_seconds.set((token_exparation - datetime.now()).total_seconds())
 
         if self.last_sync != None:
             for key in self.last_sync.keys():
                 self.metrics.gauge__icloud__last_sync_epoch.labels(SyncName=key).set(self.last_sync[key].timestamp())
-                self.metrics.gauge__icloud__last_sync_seconds.labels(SyncName=key).set((datetime.now() - self.last_sync[key]).total_seconds())
 
     def get_trusted_devices(self) -> list:
         """ List Trused 2fa devices """

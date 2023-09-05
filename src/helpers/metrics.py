@@ -5,10 +5,8 @@ class Metrics(object):
         self.counter__requests__photo_page = Counter('page_photo_requests', 'Number of photo page requests')
         self.counter__error__404 = Counter('page_error_404_counter', 'Number of 404 page returned')
         
-        self.gauge__icloud__token_exparation_seconds = Gauge("icloud_token_exparation_seconds", "Number of seconds till icloud 2fa token expires")
         self.gauge__icloud__token_exparation_epoch = Gauge("icloud_token_exparation_epoch", "Epoch of when icloud 2fa token expires")
 
-        self.gauge__icloud__last_sync_seconds = Gauge("icloud_last_sync_seconds", "Number of seconds since the last sync", ["SyncName"])
         self.gauge__icloud__last_sync_epoch = Gauge("icloud_last_sync_epoch", "Epoch of the last sync", ["SyncName"])
         self.gauge__icloud__last_sync_elapse_time = Gauge("icloud_sync_elapse_time", "Number of seconds the sync took", ["SyncName"])
 

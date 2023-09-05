@@ -21,3 +21,5 @@ settings_page.add_settings_pages(app, app_helper.prom_metrics, app_helper.config
 app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
     '/metrics': make_wsgi_app()
 })
+
+app.logger.setLevel(logging.INFO)

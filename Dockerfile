@@ -30,4 +30,4 @@ EXPOSE 5000
 HEALTHCHECK --interval=5m --timeout=3s --start-period=10s --retries=3 CMD curl -f http://localhost:8080/ || exit 1
 
 # Command to run the executable
-CMD ["flask", "run", "--host=0.0.0.0"]
+CMD ["flask", "run", "--host=0.0.0.0", "--log=INFO"]

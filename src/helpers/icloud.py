@@ -199,10 +199,10 @@ class ICloud(object):
             return
         def error_handler(ex, exception_retries):
             self.metrics.counter__icloud__download_errors.inc()
+            logging.error("Photo Handler Session error")
             if "Invalid global session" in str(ex):
                 if icloud.api:
                     self.api.authenticate()
-                logging.error("Photo Handler Session error")
             else:
                 logging.error("Photo Handler iCloud API error: " + err)
         try:
@@ -251,9 +251,9 @@ class ICloud(object):
             except exceptions.PyiCloudAPIResponseError as err:
                 self.metrics.counter__icloud__errors.inc()
                 if "Invalid global session" in str(err):
+                    logging.error("Photo List Get Session error")
                     if self.api:
                         self.api.authenticate()
-                    logging.error("Photo List Get Session error")
                 else:
                     logging.error("iCloud API error: " + err)
         return photo_status

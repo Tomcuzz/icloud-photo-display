@@ -1,5 +1,5 @@
 # Start from the latest python base image
-FROM python:3
+FROM python:3.11
 
 # Set workspace
 WORKDIR /src

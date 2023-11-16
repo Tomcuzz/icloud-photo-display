@@ -13,7 +13,7 @@ class SyncHandler(object):
         self.sync_trigger = PeriodicSyncFire(self.app, self)
         self.sync_trigger.start()
 
-    def start_sync_if_not_running(self) -> bool:
+    def start_album_sync_if_not_running(self) -> bool:
         if not self.sync_runner.is_alive():
             self.sync_runner = SyncThread(self.app)
             self.sync_runner.start()
@@ -33,7 +33,7 @@ class PeriodicSyncFire(Thread):
     def run(self):
         while True:
             if int(self.app.configs.watch_interval) > 0:
-                self.sync_handler.start_sync_if_not_running()
+                self.sync_handler.start_album_sync_if_not_running()
                 self.app.prom_metrics.gauge__icloud__next_sync_epoch.labels(SyncName=self.app.configs.icloud_album_name).set((datetime.now().timestamp() + self.app.configs.watch_interval))
                 sleep(int(self.app.configs.watch_interval))
 

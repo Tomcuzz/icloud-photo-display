@@ -12,10 +12,12 @@ def add_settings_pages(app, app_metrics:Metrics, configs:Settings, icloud_helper
         if (request.method == 'POST' and
             request.form['photo_location'] != "" and
             request.form['cookie_directory'] != "" and
+            request.form['all_watch_interval'] != "" and
             request.form['watch_interval'] != "" and
             request.form['icloud_album_name'] != ""):
             configs.photo_location = request.form['photo_location']
             configs.cookie_directory = request.form['cookie_directory']
+            configs.all_watch_interval = int(request.form['all_watch_interval'])
             configs.watch_interval = int(request.form['watch_interval'])
             if icloud_helper.is_authed and icloud_helper.photo_album_exists(request.form['icloud_album_name']):
                 configs.icloud_album_name = request.form['icloud_album_name']

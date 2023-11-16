@@ -19,7 +19,11 @@
 	<tbody>
         <form method="POST" action="/settings">
 			<tr>
-				<th scope="row">Watch Interval</th>
+				<th scope="row">All Watch Interval (Set to 0 to Disable)</th>
+                <th scope="row"><input class="form-control" type="number" name="all_watch_interval" value="{{ Configs.all_watch_interval }}"></th>
+            </tr>
+			<tr>
+				<th scope="row">Album Watch Interval (Set to 0 to Disable)</th>
                 <th scope="row"><input class="form-control" type="number" name="watch_interval" value="{{ Configs.watch_interval }}"></th>
             </tr>
 		    <tr>

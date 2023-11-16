@@ -49,6 +49,19 @@ class AlbumPeriodicSyncFire(Thread):
                 self.app.prom_metrics.gauge__icloud__next_sync_epoch.labels(SyncName=self.app.configs.icloud_album_name).set((datetime.now().timestamp() + self.app.configs.watch_interval))
                 sleep(int(self.app.configs.watch_interval))
 
+class AllPeriodicSyncFire(Thread):
+    def __init__(self, app:AppHelper, sync_handler:SyncHandler):
+        super().__init__()
+        self.app = app
+        self.sync_handler = sync_handler
+    
+    def run(self):
+        while True:
+            if int(self.app.configs.all_watch_interval) > 0:
+                self.sync_handler.start_all_sync_if_not_running()
+                self.app.prom_metrics.gauge__icloud__next_sync_epoch.labels(SyncName='All Photos').set((datetime.now().timestamp() + self.app.configs.all_watch_interval))
+                sleep(int(self.app.configs.all_watch_interval))
+
 
 class SyncThread(Thread):
     def __init__(self, app:AppHelper):

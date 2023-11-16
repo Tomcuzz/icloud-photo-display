@@ -314,7 +314,13 @@ class ICloud(object):
         self.metrics.gauge__icloud__last_sync_epoch.labels(SyncName='All Photos').set(end.timestamp())
         self.run_metric_collect()
     
-    def sync(self):
+    def sync_all(self):
+        if self.is_authed:
+            self.sync_photo_all()
+        else:
+            logging.warning("Tried to sync when not authed to iCloud")
+    
+    def sync_album(self):
         if self.is_authed:
             self.sync_photo_album()
         else:

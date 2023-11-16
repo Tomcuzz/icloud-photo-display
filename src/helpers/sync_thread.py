@@ -62,11 +62,11 @@ class SyncThread(Thread):
             if self.all_waiting:
                 logging.warning("starting all sync")
                 self.all_waiting = False
-                self.app.icloud_helper.sync_photo_all()
+                self.app.icloud_helper.sync_all()
                 logging.warning("finished all sync")
                 pass
             if self.album_waiting:
                 logging.warning("starting album sync")
                 self.album_waiting = False
-                self.app.icloud_helper.sync()
+                self.app.icloud_helper.sync_album()
                 logging.warning("finished album sync")

@@ -10,7 +10,7 @@ class SyncHandler(object):
     def __init__(self, app:AppHelper):
         self.app = app
         self.sync_runner = SyncThread(self.app)
-        self.sync_trigger = PeriodicSyncFire(self.app, self)
+        self.sync_trigger = AlbumPeriodicSyncFire(self.app, self)
         self.sync_trigger.start()
 
     def start_album_sync_if_not_running(self) -> bool:
@@ -36,7 +36,7 @@ class SyncHandler(object):
     def sync_running(self) -> bool:
         return self.sync_runner.is_alive()
 
-class PeriodicSyncFire(Thread):
+class AlbumPeriodicSyncFire(Thread):
     def __init__(self, app:AppHelper, sync_handler:SyncHandler):
         super().__init__()
         self.app = app

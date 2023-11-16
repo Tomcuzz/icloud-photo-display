@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Photo Sync Status Content{% endblock %}
+{% block body %}
+<table class="table">
+	<thead>
+		<tr>
+			<th scope="col">Name</th>
+			<th scope="col">Status</th>
+			<th scope="col">Action</th>
+		</tr>
+	</thead>
+	<tbody>
+        {% for photo_name, photo_state in ICloud_photo_album_status.items() %}
+		    <tr>
+                <th scope="row">{{ photo_name }}</th>
+                <th scope="row">
+					{% if photo_state['status'] == "non-existent" %}
+						<span class="badge rounded-pill text-bg-danger">Not Downloaded</span>
+					{% elif photo_state['status'] == "file-downloaded" %}
+						<span class="badge rounded-pill text-bg-success">Downloaded</span>
+					{% elif photo_state['status'] == "file-change" %}
+						<span class="badge rounded-pill text-bg-warning">File Change</span>
+					{% else %}
+						<span class="badge rounded-pill text-bg-secondary">{{ photo_state['status'] }}</span>
+					{% endif %}
+				</th>
+				<th scope="row">
+					{% if photo_state['status'] == "non-existent" %}
+						<a class="btn btn-success" href="/sync/album/{{ photo_name }}">Sync</a>
+					{% else %}
+						<a class="btn btn-danger" href="/delete_local/{{ photo_name }}">Delete</a>
+					{% endif %}
+				</th>
+            </tr>
+        {% endfor %}
+	</tbody>
+</table>
+{% endblock %}

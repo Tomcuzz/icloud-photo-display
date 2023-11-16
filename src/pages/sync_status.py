@@ -14,6 +14,12 @@ def add_sync_status_pages(app, icloud_helper:ICloud, configs:Settings, sync_hand
             return render_template('sync_status.html', ICloud_photo_album_status=icloud_helper.get_sync_photo_album_status, Sync_Running=sync_handler.sync_running())
         else:
             return redirect(url_for('settings_page'))
+
+    @app.route("/sync-status-content/album")
+    def sync_status_content_page():
+        """ Home Page """
+        if icloud_helper.is_authed and configs.icloud_album_name != "":
+            return render_template('sync_status_content.html', ICloud_photo_album_status=icloud_helper.get_sync_photo_album_status, Sync_Running=sync_handler.sync_running())
     
     @app.route("/sync/album/<string:photoname>")
     def sync_photo_page(photoname):

@@ -16,9 +16,21 @@ class SyncHandler(object):
     def start_album_sync_if_not_running(self) -> bool:
         if not self.sync_runner.is_alive():
             self.sync_runner = SyncThread(self.app)
+            self.sync_runner.album_waiting = True
             self.sync_runner.start()
             return True
         else:
+            self.sync_runner.album_waiting = True
+            return False
+
+    def start_all_sync_if_not_running(self) -> bool:
+        if not self.sync_runner.is_alive():
+            self.sync_runner = SyncThread(self.app)
+            self.sync_runner.all_waiting = True
+            self.sync_runner.start()
+            return True
+        else:
+            self.sync_runner.all_waiting = True
             return False
     
     def sync_running(self) -> bool:
@@ -42,8 +54,19 @@ class SyncThread(Thread):
     def __init__(self, app:AppHelper):
         super().__init__()
         self.app = app
+        self.all_waiting = False
+        self.album_waiting = False
 
     def run(self):
-        logging.warning("starting sync")
-        self.app.icloud_helper.sync()
-        logging.warning("finished sync")
+        while self.all_waiting and self.album_waiting:
+            if self.all_waiting:
+                logging.warning("starting all sync")
+                self.all_waiting = False
+                self.app.icloud_helper.sync_photo_all()
+                logging.warning("finished all sync")
+                pass
+            if self.album_waiting:
+                logging.warning("starting album sync")
+                self.album_waiting = False
+                self.app.icloud_helper.sync()
+                logging.warning("finished album sync")

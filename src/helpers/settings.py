@@ -10,7 +10,7 @@ class Settings(object):
         self.all_photo_location = working_dir + "/all-photos"
         self.icloud_album_name = ""
         self.watch_interval = 3600
-        self.all_watch_interval = 86400
+        self.all_watch_interval = 0
         self.loggedin = False
         self.username = ""
         self.max_retries = 5

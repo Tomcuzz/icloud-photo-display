@@ -7,6 +7,7 @@ class Settings(object):
         self.config_file = working_dir + "/" + config_file
         self.cookie_directory = working_dir + "/cookie"
         self.photo_location = working_dir + "/photos"
+        self.all_photo_location = working_dir + "/all-photos"
         self.icloud_album_name = ""
         self.watch_interval = 3600
         self.loggedin = False

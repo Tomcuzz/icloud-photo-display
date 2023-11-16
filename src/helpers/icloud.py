@@ -214,20 +214,33 @@ class ICloud(object):
 
     @property
     def get_sync_photo_album_status(self) -> dict:
+        return self.get_album_sync_photo_album_status(
+            self.configs.icloud_album_name,
+            self.configs.photo_location
+        )
+    
+    @property
+    def get_sync_photo_all_status(self) -> dict:
+        return self.get_album_sync_photo_album_status(
+            'All Photos',
+            self.configs.all_photo_location
+        )
+
+    def get_album_sync_photo_album_status(self, album, photo_location) -> dict:
         """ Get photo sync status """
         if not self.is_authed:
             self.metrics.counter__icloud__errors.inc()
             return {}
         self.setup_photo_error_handler()
         photo_status = {}
-        files_on_disk = paths.get_files_on_disk(self.configs.photo_location)
+        files_on_disk = paths.get_files_on_disk(photo_location)
         for i in range(3):
             try:
-                for photo in self.api.photos.albums[self.configs.icloud_album_name]:
+                for photo in self.api.photos.albums[album]:
                     if photo.item_type not in ("image"):
                         continue
                     
-                    download_path = paths.local_download_path(photo, photo.versions["original"]["size"], self.configs.photo_location)
+                    download_path = paths.local_download_path(photo, photo.versions["original"]["size"], photo_location)
 
                     save_item = {
                         'photo': photo,
@@ -287,6 +300,18 @@ class ICloud(object):
         end = datetime.now()
         self.metrics.gauge__icloud__last_sync_elapse_time.labels(SyncName=album_name).set((end - start).total_seconds())
         self.metrics.gauge__icloud__last_sync_epoch.labels(SyncName=album_name).set(end.timestamp())
+        self.run_metric_collect()
+
+    def sync_photo_all(self):
+        """ Download missing photos to local path """
+        start = datetime.now()
+        self.setup_photo_error_handler()
+        photos = self.get_sync_photo_all_status
+        for photo in photos.keys():
+            self.sync_photo(photo, photos)
+        end = datetime.now()
+        self.metrics.gauge__icloud__last_sync_elapse_time.labels(SyncName='All Photos').set((end - start).total_seconds())
+        self.metrics.gauge__icloud__last_sync_epoch.labels(SyncName='All Photos').set(end.timestamp())
         self.run_metric_collect()
     
     def sync(self):

@@ -11,8 +11,8 @@ class SyncHandler(object):
         self.app = app
         self.sync_runner = SyncThread(self.app)
         self.sync_runner.album_waiting = True
-        self.sync_trigger = AlbumPeriodicSyncFire(self.app, self)
-        self.sync_trigger.start()
+        self.album_sync_trigger = AlbumPeriodicSyncFire(self.app, self)
+        self.album_sync_trigger.start()
 
     def start_album_sync_if_not_running(self) -> bool:
         if not self.sync_runner.is_alive():

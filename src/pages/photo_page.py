@@ -8,6 +8,7 @@ from src.helpers.settings import Settings # pylint: disable=import-error
 from src.helpers.metrics import Metrics # pylint: disable=import-error
 from src.helpers import paths # pylint: disable=import-error
 from wand.image import Image
+from wand.resource import limits
 
 def add_photo_page(app, app_metrics:Metrics, configs:Settings):
     """ Add Home Page """
@@ -35,6 +36,12 @@ def add_photo_page(app, app_metrics:Metrics, configs:Settings):
         if not os.path.isfile(disk_photos[filename]['file_path']):
             app_metrics.counter__error__404.inc()
             abort(404)
+            
+        # Use 1GB of ram before writing temp data to disk.
+        limits['memory'] = 1024 * 1024 * 1024
+        # Reject images larger than 100000x100000.
+        limits['width'] = 100000
+        limits['height'] = 100000
         with Image(filename=disk_photos[filename]['file_path']) as img:
             return send_file(
                 io.BytesIO(img.make_blob('jpeg')),

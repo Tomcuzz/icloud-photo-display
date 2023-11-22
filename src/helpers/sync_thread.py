@@ -16,25 +16,25 @@ class SyncHandler(object):
 
     def start_album_sync_if_not_running(self) -> bool:
         if not self.sync_runner.is_alive():
-            logging.info("Starting new sync thread for album")
+            logging.warning("Starting new sync thread for album")
             self.sync_runner = SyncThread(self.app)
             self.sync_runner.album_waiting = True
             self.sync_runner.start()
             return True
         else:
-            logging.info("Using existing sync thread for album")
+            logging.warning("Using existing sync thread for album")
             self.sync_runner.album_waiting = True
             return False
 
     def start_all_sync_if_not_running(self) -> bool:
         if not self.sync_runner.is_alive():
-            logging.info("Starting new sync thread for all")
+            logging.warning("Starting new sync thread for all")
             self.sync_runner = SyncThread(self.app)
             self.sync_runner.all_waiting = True
             self.sync_runner.start()
             return True
         else:
-            logging.info("Using existing sync thread for all")
+            logging.warning("Using existing sync thread for all")
             self.sync_runner.all_waiting = True
             return False
     
@@ -78,12 +78,12 @@ class SyncThread(Thread):
     def run(self):
         while self.all_waiting and self.album_waiting:
             if self.all_waiting:
-                logging.info("starting all sync")
+                logging.warning("starting all sync")
                 self.all_waiting = False
                 self.app.icloud_helper.sync_all()
-                logging.info("finished all sync")
+                logging.warning("finished all sync")
             if self.album_waiting:
-                logging.info("starting album sync")
+                logging.warning("starting album sync")
                 self.album_waiting = False
                 self.app.icloud_helper.sync_album()
-                logging.info("finished album sync")
+                logging.warning("finished album sync")

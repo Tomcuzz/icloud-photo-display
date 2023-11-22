@@ -76,11 +76,7 @@ class SyncThread(Thread):
         self.album_waiting = False
 
     def run(self):
-        logging.warning("all_waiting is: ")
-        logging.warning(self.all_waiting)
-        logging.warning("album_waiting is: ")
-        logging.warning(self.album_waiting)
-        while self.all_waiting and self.album_waiting:
+        while self.all_waiting or self.album_waiting:
             if self.all_waiting:
                 logging.warning("starting all sync")
                 self.all_waiting = False

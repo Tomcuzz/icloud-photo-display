@@ -279,7 +279,10 @@ class ICloud(object):
     def delete_local_photo(self, name) -> bool:
         photos = self.get_sync_photo_album_status
         if name in photos:
-            download_path = paths.local_download_path(photos[name]['photo'], photos[name]['photo'].versions["original"]["size"], self.app.configs.photo_location)
+            download_path = paths.local_download_path(
+                photos[name]['photo'],
+                photos[name]['photo'].versions["original"]["size"],
+                self.app.configs.photo_location)
             if os.path.exists(download_path):
                 os.remove(download_path)
                 return True

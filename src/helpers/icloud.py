@@ -304,57 +304,31 @@ class ICloud(object):
             if photos[name]['status'] == "non-existent":
                 self.download_photo(photos[name]['photo'], photos[name]['local_path'])
 
-    def sync_photo_album(self):
+    def sync_album(self, sync_all_photos=False):
         """ Download missing photos to local path """
-        album_name = self.app.configs.icloud_album_name
-        self.app.prom_metrics.enum__icloud__sync_running_status.labels(
-            SyncName=album_name).state('running')
-        start = datetime.now()
-        self.setup_photo_error_handler()
-        self.app.flask_app.logger.debug("All Sync - Getting statuses")
-        photos = self.get_sync_photo_album_status
-        self.app.flask_app.logger.debug("All Sync - Photo Status Recieved")
-        for photo in photos.keys():
-            self.app.flask_app.logger.debug("Syncing photo: " + photo)
-            self.sync_photo(photo, photos)
-        end = datetime.now()
-        self.app.prom_metrics.gauge__icloud__last_sync_elapse_time.labels(
-            SyncName=album_name).set((end - start).total_seconds())
-        self.app.prom_metrics.gauge__icloud__last_sync_epoch.labels(
-            SyncName=album_name).set(end.timestamp())
-        self.app.prom_metrics.enum__icloud__sync_running_status.labels(
-            SyncName=album_name).state('waiting')
-        self.run_metric_collect()
-
-    def sync_photo_all(self):
-        """ Download missing photos to local path """
-        self.app.prom_metrics.enum__icloud__sync_running_status.labels(
-            SyncName='All Photos').state('running')
-        start = datetime.now()
-        self.setup_photo_error_handler()
-        self.app.flask_app.logger.debug("All Sync - Getting statuses")
-        photos = self.get_sync_photo_all_status
-        self.app.flask_app.logger.debug("All Sync - Photo Status Recieved")
-        for photo in photos.keys():
-            self.app.flask_app.logger.debug("Syncing photo: " + photo)
-            self.sync_photo(photo, photos)
-        end = datetime.now()
-        self.app.prom_metrics.gauge__icloud__last_sync_elapse_time.labels(
-            SyncName='All Photos').set((end - start).total_seconds())
-        self.app.prom_metrics.gauge__icloud__last_sync_epoch.labels(
-            SyncName='All Photos').set(end.timestamp())
-        self.app.prom_metrics.enum__icloud__sync_running_status.labels(
-            SyncName='All Photos').state('waiting')
-        self.run_metric_collect()
-
-    def sync_all(self):
         if self.is_authed:
-            self.sync_photo_all()
-        else:
-            self.app.flask_app.logger.warning("Tried to sync when not authed to iCloud")
-
-    def sync_album(self):
-        if self.is_authed:
-            self.sync_photo_album()
+            album_name = 'All Photos'
+            download_path = self.app.configs.all_photo_location
+            if not sync_all_photos:
+                album_name = self.app.configs.icloud_album_name
+                download_path = self.app.configs.photo_location
+            self.app.prom_metrics.enum__icloud__sync_running_status.labels(
+                SyncName=album_name).state('running')
+            start = datetime.now()
+            self.setup_photo_error_handler()
+            self.app.flask_app.logger.debug(album_name + " Sync - Getting statuses")
+            photos = self.get_album_sync_photo_album_status(album_name, download_path)
+            self.app.flask_app.logger.debug(album_name + " Sync - Photo Status Recieved")
+            for photo in photos:
+                self.app.flask_app.logger.debug("Syncing photo: " + photo)
+                self.sync_photo(photo, photos)
+            end = datetime.now()
+            self.app.prom_metrics.gauge__icloud__last_sync_elapse_time.labels(
+                SyncName=album_name).set((end - start).total_seconds())
+            self.app.prom_metrics.gauge__icloud__last_sync_epoch.labels(
+                SyncName=album_name).set(end.timestamp())
+            self.app.prom_metrics.enum__icloud__sync_running_status.labels(
+                SyncName=album_name).state('waiting')
+            self.run_metric_collect()
         else:
             self.app.flask_app.logger.warning("Tried to sync when not authed to iCloud")

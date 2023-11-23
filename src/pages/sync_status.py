@@ -26,9 +26,9 @@ def add_sync_status_pages(app, icloud_helper:ICloud, configs:Settings, sync_hand
         """ Sync Photo Page """
         if photoname == "all":
             sync_handler.start_album_sync_if_not_running()
-            icloud_helper.sync_photo_album()
+            icloud_helper.sync_album()
         else:
-            icloud_helper.sync_photo(photname)
+            icloud_helper.sync_photo(photoname)
         return redirect(url_for('sync_status_page'))
     
     @app.route("/delete_local/<string:photname>")

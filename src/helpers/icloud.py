@@ -236,31 +236,34 @@ class ICloud(object):
         files_on_disk = paths.get_files_on_disk(photo_location)
         for i in range(3):
             try:
-                for photo in self.api.photos.albums[album]:
-                    if photo.item_type not in ("image"):
-                        continue
+                if album in self.api.photos.albums:
+                    for photo in self.api.photos.albums[album]:
+                        if photo.item_type not in ("image"):
+                            continue
 
-                    download_path = paths.local_download_path(photo, photo.versions["original"]["size"], photo_location)
+                        download_path = paths.local_download_path(photo, photo.versions["original"]["size"], photo_location)
 
-                    save_item = {
-                        'photo': photo,
-                        'local_path': download_path
-                    }
+                        save_item = {
+                            'photo': photo,
+                            'local_path': download_path
+                        }
 
-                    if paths.clean_filename(photo.filename) in files_on_disk:
-                        # for later: this crashes if download-size medium is specified
-                        file_size = files_on_disk[paths.clean_filename(photo.filename)]['size']
-                        version = photo.versions["original"]
-                        photo_size = version["size"]
-                        if str(file_size) != str(photo_size):
-                            # Looks like files changed.... delete and recreate
-                            save_item['status'] = "file-change"
+                        if paths.clean_filename(photo.filename) in files_on_disk:
+                            # for later: this crashes if download-size medium is specified
+                            file_size = files_on_disk[paths.clean_filename(photo.filename)]['size']
+                            version = photo.versions["original"]
+                            photo_size = version["size"]
+                            if str(file_size) != str(photo_size):
+                                # Looks like files changed.... delete and recreate
+                                save_item['status'] = "file-change"
+                            else:
+                                save_item['status'] = "file-downloaded"
                         else:
-                            save_item['status'] = "file-downloaded"
-                    else:
-                        save_item['status'] = "non-existent"
+                            save_item['status'] = "non-existent"
 
-                    photo_status[photo.filename] = save_item
+                        photo_status[photo.filename] = save_item
+                else:
+                    self.app.flask_app.logger("Photo Album '" + album + "' not found")
             except exceptions.PyiCloudAPIResponseError as err:
                 self.app.prom_metrics.counter__icloud__errors.inc()
                 if "Invalid global session" in str(err):

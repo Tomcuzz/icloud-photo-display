@@ -1,5 +1,5 @@
 """ Code to home web page """
-from flask import render_template, request, redirect, url_for, abort
+from flask import render_template, request, redirect, url_for
 from src.helpers.settings import Settings # pylint: disable=import-error
 from src.helpers.icloud import ICloud # pylint: disable=import-error
 from src.helpers.metrics import Metrics # pylint: disable=import-error

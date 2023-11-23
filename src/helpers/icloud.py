@@ -5,6 +5,7 @@ import logging
 from datetime import datetime
 from piexif._exceptions import InvalidImageDataError
 from tzlocal import get_localzone
+from src.helpers.app import AppHelper # pylint: disable=import-error
 from src.pyicloud_ipd import utils, base, exceptions # pylint: disable=import-error
 from src.helpers.settings import Settings # pylint: disable=import-error
 from src.helpers.metrics import Metrics # pylint: disable=import-error
@@ -12,41 +13,40 @@ from src.helpers import exif, download, paths # pylint: disable=import-error
 
 class ICloud(object):
     """ iCloud api connection class """
-    def __init__(self, configs:Settings, metrics:Metrics) -> None:
-        self.configs = configs
-        self.metrics = metrics
+    def __init__(self, app:AppHelper) -> None:
+        self.app = app
         self.api = self.setup_api()
 
     def setup_api(self, password=None) -> base.PyiCloudService:
         """ Setup api connection """
-        if not (self.configs.username != ""):
+        if not (self.app.configs.username != ""):
             return None
 
         passwd = None
         if password != None:
             passwd = password.strip()
 
-        if self.configs.username:
+        if self.app.configs.username:
             try:
-                logging.debug('Cookie directory: ' + self.configs.cookie_directory)
+                logging.debug('Cookie directory: ' + self.app.configs.cookie_directory)
                 self.api = base.PyiCloudService(
                     "com",
-                    self.configs.username.strip(),
+                    self.app.configs.username.strip(),
                     passwd,
-                    cookie_directory=self.configs.cookie_directory
+                    cookie_directory=self.app.configs.cookie_directory
                 )
-                if passwd or not utils.password_exists_in_keyring(self.configs.username):
-                    utils.store_password_in_keyring(self.configs.username, passwd)
+                if passwd or not utils.password_exists_in_keyring(self.app.configs.username):
+                    utils.store_password_in_keyring(self.app.configs.username, passwd)
                 
                 return self.api
             except exceptions.NoStoredPasswordAvailable:
-                self.metrics.counter__icloud__errors.inc()
+                self.app.prom_metrics.counter__icloud__errors.inc()
                 logging.warning('iCloud password not avalible')
             except exceptions.PyiCloudFailedLoginException:
-                self.metrics.counter__icloud__errors.inc()
+                self.app.prom_metrics.counter__icloud__errors.inc()
                 logging.warning('iCloud Login Failed')
             except exceptions.PyiCloudServiceNotActivatedErrror:
-                self.metrics.counter__icloud__errors.inc()
+                self.app.prom_metrics.counter__icloud__errors.inc()
                 logging.warning('iCloud Not Activated')
         return None
 
@@ -68,12 +68,12 @@ class ICloud(object):
     @property
     def has_username(self) -> bool:
         """ Check if have saved username """
-        return self.configs.username != ""
+        return self.app.configs.username != ""
 
     @property
     def has_password(self) -> bool:
         """ Check if have saved password """
-        return utils.password_exists_in_keyring(self.configs.username)
+        return utils.password_exists_in_keyring(self.app.configs.username)
 
     @property
     def needs_2fa_setup(self) -> bool:
@@ -86,13 +86,13 @@ class ICloud(object):
     def get_token_exparation(self) -> datetime:
         exparation = None
         if not self.api:
-            self.metrics.counter__icloud__errors.inc()
+            self.app.prom_metrics.counter__icloud__errors.inc()
             return exparation
         elif not self.has_password:
-            self.metrics.counter__icloud__errors.inc()
+            self.app.prom_metrics.counter__icloud__errors.inc()
             return exparation
         elif self.needs_2fa_setup:
-            self.metrics.counter__icloud__errors.inc()
+            self.app.prom_metrics.counter__icloud__errors.inc()
             return exparation
         if self.api and self.api.session and self.api.session.cookies:
             cookie_dict = {c.name: c for c in self.api.session.cookies}
@@ -109,7 +109,7 @@ class ICloud(object):
     def run_metric_collect(self):
         token_exparation = self.get_token_exparation
         if token_exparation is not None:
-            self.metrics.gauge__icloud__token_exparation_epoch.set(token_exparation.timestamp())
+            self.app.prom_metrics.gauge__icloud__token_exparation_epoch.set(token_exparation.timestamp())
 
     def get_trusted_devices(self) -> list:
         """ List Trused 2fa devices """
@@ -127,27 +127,27 @@ class ICloud(object):
     def send_2fa_code(self, device_id:int) -> bool:
         """ Request 2fa code send """
         if self.api.trusted_devices is None or len(self.api.trusted_devices) < device_id or device_id < 0:
-            self.metrics.counter__icloud__errors.inc()
+            self.app.prom_metrics.counter__icloud__errors.inc()
             return False
         return self.api.send_verification_code(self.api.trusted_devices[device_id])
 
     def validate_2fa_code(self, device_id:int, code:str) -> bool:
         """ Validate 2fa code """
         if self.api.trusted_devices is None or device_id < 0:
-            self.metrics.counter__icloud__errors.inc()
+            self.app.prom_metrics.counter__icloud__errors.inc()
             return False
         if len(self.api.trusted_devices) == device_id:
             device = {}
             return self.api.validate_verification_code(device, code)
         if len(self.api.trusted_devices) > device_id:
             return self.api.validate_verification_code(self.api.trusted_devices[device_id], code)
-        self.metrics.counter__icloud__errors.inc()
+        self.app.prom_metrics.counter__icloud__errors.inc()
         return False
     
     def photo_album_exists(self, name:str) -> bool:
         """ Check if a given string name is the same as an icloud alum """
         if not self.is_authed:
-            self.metrics.counter__icloud__errors.inc()
+            self.app.prom_metrics.counter__icloud__errors.inc()
             return False
         self.setup_photo_error_handler()
         try:
@@ -155,11 +155,11 @@ class ICloud(object):
             if name in albums_dict:
                 return True
         except exceptions.PyiCloudAPIResponseError as err:
-            self.metrics.counter__icloud__errors.inc()
+            self.app.prom_metrics.counter__icloud__errors.inc()
             # For later: come up with a nicer message to the user. For now take the
             # exception text
             logging.warning("Photo album list error: " + err)
-        self.metrics.counter__icloud__errors.inc()
+        self.app.prom_metrics.counter__icloud__errors.inc()
         return False
     
     def download_photo(self, photo, download_path) -> bool:
@@ -168,7 +168,7 @@ class ICloud(object):
         try:
             created_date = photo.created.astimezone(get_localzone())
         except (ValueError, OSError):
-            self.metrics.counter__icloud__download_errors.inc()
+            self.app.prom_metrics.counter__icloud__download_errors.inc()
             logging.error(
                 "Could not convert photo created date to local timezone (%s)",
                 photo.created)
@@ -178,7 +178,7 @@ class ICloud(object):
         )
         
         if download_result:
-            self.metrics.counter__icloud__number_of_files_downloaded.inc()
+            self.app.prom_metrics.counter__icloud__number_of_files_downloaded.inc()
             if False and paths.clean_filename(photo.filename) \
                 .lower().endswith((".jpg", ".jpeg")) and \
                 not exif.get_photo_exif(download_path):
@@ -191,14 +191,14 @@ class ICloud(object):
                     )
             download.set_utime(download_path, created_date)
         else:
-            self.metrics.counter__icloud__download_errors.inc()
+            self.app.prom_metrics.counter__icloud__download_errors.inc()
     
     def setup_photo_error_handler(self):
         if not self.is_authed:
-            self.metrics.counter__icloud__errors.inc()
+            self.app.prom_metrics.counter__icloud__errors.inc()
             return
         def error_handler(ex, exception_retries):
-            self.metrics.counter__icloud__download_errors.inc()
+            self.app.prom_metrics.counter__icloud__download_errors.inc()
             logging.error("Photo Handler Session error")
             if "Invalid global session" in str(ex):
                 if icloud.api:
@@ -208,28 +208,28 @@ class ICloud(object):
         try:
             self.api.photos.exception_handler = error_handler
         except exceptions.PyiCloudAPIResponseError as err:
-            self.metrics.counter__icloud__errors.inc()
+            self.app.prom_metrics.counter__icloud__errors.inc()
             logging.error("Photo Handler Setup error: " + err)
             error_handler(err, 0)
 
     @property
     def get_sync_photo_album_status(self) -> dict:
         return self.get_album_sync_photo_album_status(
-            self.configs.icloud_album_name,
-            self.configs.photo_location
+            self.app.configs.icloud_album_name,
+            self.app.configs.photo_location
         )
     
     @property
     def get_sync_photo_all_status(self) -> dict:
         return self.get_album_sync_photo_album_status(
             'All Photos',
-            self.configs.all_photo_location
+            self.app.configs.all_photo_location
         )
 
     def get_album_sync_photo_album_status(self, album, photo_location) -> dict:
         """ Get photo sync status """
         if not self.is_authed:
-            self.metrics.counter__icloud__errors.inc()
+            self.app.prom_metrics.counter__icloud__errors.inc()
             return {}
         self.setup_photo_error_handler()
         photo_status = {}
@@ -262,7 +262,7 @@ class ICloud(object):
                     
                     photo_status[photo.filename] = save_item
             except exceptions.PyiCloudAPIResponseError as err:
-                self.metrics.counter__icloud__errors.inc()
+                self.app.prom_metrics.counter__icloud__errors.inc()
                 if "Invalid global session" in str(err):
                     logging.error("Photo List Get Session error")
                     if self.api:
@@ -274,7 +274,7 @@ class ICloud(object):
     def delete_local_photo(self, name) -> bool:
         photos = self.get_sync_photo_album_status
         if name in photos:
-            download_path = paths.local_download_path(photos[name]['photo'], photos[name]['photo'].versions["original"]["size"], self.configs.photo_location)
+            download_path = paths.local_download_path(photos[name]['photo'], photos[name]['photo'].versions["original"]["size"], self.app.configs.photo_location)
             if os.path.exists(download_path):
                 os.remove(download_path)
                 return True
@@ -291,31 +291,31 @@ class ICloud(object):
 
     def sync_photo_album(self):
         """ Download missing photos to local path """
-        self.metrics.enum__icloud__sync_running_status.labels(SyncName=album_name).state('running')
+        self.app.prom_metrics.enum__icloud__sync_running_status.labels(SyncName=album_name).state('running')
         start = datetime.now()
         self.setup_photo_error_handler()
         photos = self.get_sync_photo_album_status
         for photo in photos.keys():
             self.sync_photo(photo, photos)
-        album_name = self.configs.icloud_album_name
+        album_name = self.app.configs.icloud_album_name
         end = datetime.now()
-        self.metrics.gauge__icloud__last_sync_elapse_time.labels(SyncName=album_name).set((end - start).total_seconds())
-        self.metrics.gauge__icloud__last_sync_epoch.labels(SyncName=album_name).set(end.timestamp())
-        self.metrics.enum__icloud__sync_running_status.labels(SyncName=album_name).state('waiting')
+        self.app.prom_metrics.gauge__icloud__last_sync_elapse_time.labels(SyncName=album_name).set((end - start).total_seconds())
+        self.app.prom_metrics.gauge__icloud__last_sync_epoch.labels(SyncName=album_name).set(end.timestamp())
+        self.app.prom_metrics.enum__icloud__sync_running_status.labels(SyncName=album_name).state('waiting')
         self.run_metric_collect()
 
     def sync_photo_all(self):
         """ Download missing photos to local path """
-        self.metrics.enum__icloud__sync_running_status.labels(SyncName='All Photos').state('running')
+        self.app.prom_metrics.enum__icloud__sync_running_status.labels(SyncName='All Photos').state('running')
         start = datetime.now()
         self.setup_photo_error_handler()
         photos = self.get_sync_photo_all_status
         for photo in photos.keys():
             self.sync_photo(photo, photos)
         end = datetime.now()
-        self.metrics.gauge__icloud__last_sync_elapse_time.labels(SyncName='All Photos').set((end - start).total_seconds())
-        self.metrics.gauge__icloud__last_sync_epoch.labels(SyncName='All Photos').set(end.timestamp())
-        self.metrics.enum__icloud__sync_running_status.labels(SyncName='All Photos').state('waiting')
+        self.app.prom_metrics.gauge__icloud__last_sync_elapse_time.labels(SyncName='All Photos').set((end - start).total_seconds())
+        self.app.prom_metrics.gauge__icloud__last_sync_epoch.labels(SyncName='All Photos').set(end.timestamp())
+        self.app.prom_metrics.enum__icloud__sync_running_status.labels(SyncName='All Photos').state('waiting')
         self.run_metric_collect()
     
     def sync_all(self):

@@ -10,7 +10,10 @@ class SyncHandler(object):
     def __init__(self, app:AppHelper):
         self.app = app
         self.sync_runner = SyncThread(self.app)
-        self.sync_runner.album_waiting = True
+        if int(self.app.configs.all_watch_interval) > 0:
+            self.sync_runner.all_waiting = True
+        if int(self.app.configs.watch_interval) > 0:
+            self.sync_runner.album_waiting = True
         self.album_sync_trigger = AlbumPeriodicSyncFire(self.app, self)
         self.album_sync_trigger.start()
         self.all_sync_trigger = AllPeriodicSyncFire(self.app, self)

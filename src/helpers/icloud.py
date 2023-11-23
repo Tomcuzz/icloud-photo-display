@@ -19,16 +19,17 @@ class ICloud(object):
 
     def setup_api(self, password=None) -> base.PyiCloudService:
         """ Setup api connection """
-        if not (self.app.configs.username != ""):
+        if self.app.configs.username == "":
             return None
 
         passwd = None
-        if password != None:
+        if password is not None:
             passwd = password.strip()
 
         if self.app.configs.username:
             try:
-                self.app.flask_app.logger.debug('Cookie directory: ' + self.app.configs.cookie_directory)
+                self.app.flask_app.logger.debug(
+                    'Cookie directory: ' + self.app.configs.cookie_directory)
                 self.api = base.PyiCloudService(
                     "com",
                     self.app.configs.username.strip(),
@@ -56,6 +57,7 @@ class ICloud(object):
 
     @property
     def is_authed(self) -> bool:
+        """ Check if auth'ed to icloud. """
         if not self.api:
             return False
         elif not self.has_password:
@@ -84,6 +86,7 @@ class ICloud(object):
 
     @property
     def get_token_exparation(self) -> datetime:
+        """ Return the time that the token expires. """
         exparation = None
         if not self.api:
             self.app.prom_metrics.counter__icloud__errors.inc()
@@ -107,9 +110,11 @@ class ICloud(object):
         return exparation
 
     def run_metric_collect(self):
+        """ Function to Collect metrics and export them. """
         token_exparation = self.get_token_exparation
         if token_exparation is not None:
-            self.app.prom_metrics.gauge__icloud__token_exparation_epoch.set(token_exparation.timestamp())
+            self.app.prom_metrics.gauge__icloud__token_exparation_epoch.set(
+                token_exparation.timestamp())
 
     def get_trusted_devices(self) -> list:
         """ List Trused 2fa devices """
@@ -183,8 +188,6 @@ class ICloud(object):
                 .lower().endswith((".jpg", ".jpeg")) and \
                 not exif.get_photo_exif(download_path):
                     # %Y:%m:%d looks wrong, but it's the correct format
-                    date_str = created_date.strftime(
-                        "%Y-%m-%d %H:%M:%S%z")
                     exif.set_photo_exif(
                         download_path,
                         created_date.strftime("%Y:%m:%d %H:%M:%S"),
@@ -201,7 +204,7 @@ class ICloud(object):
             self.app.prom_metrics.counter__icloud__download_errors.inc()
             self.app.flask_app.logger.error("Photo Handler Session error")
             if "Invalid global session" in str(ex):
-                if icloud.api:
+                if self.api:
                     self.api.authenticate()
             else:
                 self.app.flask_app.logger.error("Photo Handler iCloud API error: " + err)
@@ -241,7 +244,10 @@ class ICloud(object):
                         if photo.item_type not in ("image"):
                             continue
 
-                        download_path = paths.local_download_path(photo, photo.versions["original"]["size"], photo_location)
+                        download_path = paths.local_download_path(
+                            photo,
+                            photo.versions["original"]["size"],
+                            photo_location)
 
                         save_item = {
                             'photo': photo,
@@ -277,6 +283,7 @@ class ICloud(object):
         return photo_status
 
     def delete_local_photo(self, name) -> bool:
+        """ Delete a local photo """
         photos = self.get_sync_photo_album_status
         if name in photos:
             download_path = paths.local_download_path(
@@ -300,7 +307,8 @@ class ICloud(object):
     def sync_photo_album(self):
         """ Download missing photos to local path """
         album_name = self.app.configs.icloud_album_name
-        self.app.prom_metrics.enum__icloud__sync_running_status.labels(SyncName=album_name).state('running')
+        self.app.prom_metrics.enum__icloud__sync_running_status.labels(
+            SyncName=album_name).state('running')
         start = datetime.now()
         self.setup_photo_error_handler()
         self.app.flask_app.logger.debug("All Sync - Getting statuses")
@@ -310,14 +318,18 @@ class ICloud(object):
             self.app.flask_app.logger.debug("Syncing photo: " + photo)
             self.sync_photo(photo, photos)
         end = datetime.now()
-        self.app.prom_metrics.gauge__icloud__last_sync_elapse_time.labels(SyncName=album_name).set((end - start).total_seconds())
-        self.app.prom_metrics.gauge__icloud__last_sync_epoch.labels(SyncName=album_name).set(end.timestamp())
-        self.app.prom_metrics.enum__icloud__sync_running_status.labels(SyncName=album_name).state('waiting')
+        self.app.prom_metrics.gauge__icloud__last_sync_elapse_time.labels(
+            SyncName=album_name).set((end - start).total_seconds())
+        self.app.prom_metrics.gauge__icloud__last_sync_epoch.labels(
+            SyncName=album_name).set(end.timestamp())
+        self.app.prom_metrics.enum__icloud__sync_running_status.labels(
+            SyncName=album_name).state('waiting')
         self.run_metric_collect()
 
     def sync_photo_all(self):
         """ Download missing photos to local path """
-        self.app.prom_metrics.enum__icloud__sync_running_status.labels(SyncName='All Photos').state('running')
+        self.app.prom_metrics.enum__icloud__sync_running_status.labels(
+            SyncName='All Photos').state('running')
         start = datetime.now()
         self.setup_photo_error_handler()
         self.app.flask_app.logger.debug("All Sync - Getting statuses")
@@ -327,17 +339,20 @@ class ICloud(object):
             self.app.flask_app.logger.debug("Syncing photo: " + photo)
             self.sync_photo(photo, photos)
         end = datetime.now()
-        self.app.prom_metrics.gauge__icloud__last_sync_elapse_time.labels(SyncName='All Photos').set((end - start).total_seconds())
-        self.app.prom_metrics.gauge__icloud__last_sync_epoch.labels(SyncName='All Photos').set(end.timestamp())
-        self.app.prom_metrics.enum__icloud__sync_running_status.labels(SyncName='All Photos').state('waiting')
+        self.app.prom_metrics.gauge__icloud__last_sync_elapse_time.labels(
+            SyncName='All Photos').set((end - start).total_seconds())
+        self.app.prom_metrics.gauge__icloud__last_sync_epoch.labels(
+            SyncName='All Photos').set(end.timestamp())
+        self.app.prom_metrics.enum__icloud__sync_running_status.labels(
+            SyncName='All Photos').state('waiting')
         self.run_metric_collect()
-    
+
     def sync_all(self):
         if self.is_authed:
             self.sync_photo_all()
         else:
             self.app.flask_app.logger.warning("Tried to sync when not authed to iCloud")
-    
+
     def sync_album(self):
         if self.is_authed:
             self.sync_photo_album()

@@ -37,7 +37,7 @@ class ICloud(object):
                 )
                 if passwd or not utils.password_exists_in_keyring(self.app.configs.username):
                     utils.store_password_in_keyring(self.app.configs.username, passwd)
-                
+
                 return self.api
             except exceptions.NoStoredPasswordAvailable:
                 self.app.prom_metrics.counter__icloud__errors.inc()
@@ -81,7 +81,7 @@ class ICloud(object):
         if self.api is None:
             return False
         return self.api.requires_2sa
-    
+
     @property
     def get_token_exparation(self) -> datetime:
         exparation = None
@@ -105,7 +105,7 @@ class ICloud(object):
                 if expires is not None:
                     exparation = datetime.utcfromtimestamp(expires)
         return exparation
-    
+
     def run_metric_collect(self):
         token_exparation = self.get_token_exparation
         if token_exparation is not None:
@@ -143,7 +143,7 @@ class ICloud(object):
             return self.api.validate_verification_code(self.api.trusted_devices[device_id], code)
         self.app.prom_metrics.counter__icloud__errors.inc()
         return False
-    
+
     def photo_album_exists(self, name:str) -> bool:
         """ Check if a given string name is the same as an icloud alum """
         if not self.is_authed:
@@ -161,7 +161,7 @@ class ICloud(object):
             self.app.flask_app.logger.warning("Photo album list error: " + err)
         self.app.prom_metrics.counter__icloud__errors.inc()
         return False
-    
+
     def download_photo(self, photo, download_path) -> bool:
         """ Given a path download a photo from iCloud """
         self.setup_photo_error_handler()
@@ -176,7 +176,7 @@ class ICloud(object):
         download_result = download.download_media(
             self, photo, download_path, "original"
         )
-        
+
         if download_result:
             self.app.prom_metrics.counter__icloud__number_of_files_downloaded.inc()
             if False and paths.clean_filename(photo.filename) \
@@ -192,7 +192,7 @@ class ICloud(object):
             download.set_utime(download_path, created_date)
         else:
             self.app.prom_metrics.counter__icloud__download_errors.inc()
-    
+
     def setup_photo_error_handler(self):
         if not self.is_authed:
             self.app.prom_metrics.counter__icloud__errors.inc()
@@ -218,7 +218,7 @@ class ICloud(object):
             self.app.configs.icloud_album_name,
             self.app.configs.photo_location
         )
-    
+
     @property
     def get_sync_photo_all_status(self) -> dict:
         return self.get_album_sync_photo_album_status(
@@ -239,7 +239,7 @@ class ICloud(object):
                 for photo in self.api.photos.albums[album]:
                     if photo.item_type not in ("image"):
                         continue
-                    
+
                     download_path = paths.local_download_path(photo, photo.versions["original"]["size"], photo_location)
 
                     save_item = {
@@ -259,7 +259,7 @@ class ICloud(object):
                             save_item['status'] = "file-downloaded"
                     else:
                         save_item['status'] = "non-existent"
-                    
+
                     photo_status[photo.filename] = save_item
             except exceptions.PyiCloudAPIResponseError as err:
                 self.app.prom_metrics.counter__icloud__errors.inc()
@@ -270,7 +270,7 @@ class ICloud(object):
                 else:
                     self.app.flask_app.logger.error("iCloud API error: " + err)
         return photo_status
-    
+
     def delete_local_photo(self, name) -> bool:
         photos = self.get_sync_photo_album_status
         if name in photos:

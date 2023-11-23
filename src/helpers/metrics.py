@@ -1,4 +1,4 @@
-from prometheus_client import Counter, Gauge
+from prometheus_client import Counter, Gauge, Enum
 
 class Metrics(object):
     def __init__(self):
@@ -9,6 +9,8 @@ class Metrics(object):
         self.gauge__icloud__next_sync_epoch = Gauge("icloud_next_sync_epoch", "Epoch of the next sync", ["SyncName"])
         self.gauge__icloud__last_sync_epoch = Gauge("icloud_last_sync_epoch", "Epoch of the last sync", ["SyncName"])
         self.gauge__icloud__last_sync_elapse_time = Gauge("icloud_sync_elapse_time", "Number of seconds the sync took", ["SyncName"])
+
+        self.enum__icloud__sync_running_status = Enum("icloud_sync_running_status", "Current sync running status", ["SyncName"], states=['running', 'waiting'])
 
         self.counter__icloud__number_of_files_downloaded = Counter("icloud_number_of_files_downloaded", "Number of files the sync downloaded")
         self.counter__icloud__download_errors = Counter("icloud_download_errors", "Number of download errors encountered")

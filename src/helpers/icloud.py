@@ -242,7 +242,7 @@ class ICloud(object):
         for i in range(3):
             try:
                 if album in self.api.photos.albums:
-                    self.app.flask_app.logger.warning(
+                    self.app.flask_app.logger.debug(
                         "Album sync - Album '" + album + "' found")
                     for photo in self.api.photos.albums[album]:
                         if photo.item_type not in ("image"):
@@ -266,10 +266,16 @@ class ICloud(object):
                             if str(file_size) != str(photo_size):
                                 # Looks like files changed.... delete and recreate
                                 save_item['status'] = "file-change"
+                                self.app.flask_app.logger.debug(
+                                    "Album sync - Photo '" + photo.filename + "' file-change")
                             else:
                                 save_item['status'] = "file-downloaded"
+                                self.app.flask_app.logger.debug(
+                                    "Album sync - Photo '" + photo.filename + "' file-exists")
                         else:
                             save_item['status'] = "non-existent"
+                            self.app.flask_app.logger.debug(
+                                "Album sync - Photo '" + photo.filename + "' file-does-not-exist")
 
                         photo_status[photo.filename] = save_item
                 else:

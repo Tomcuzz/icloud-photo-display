@@ -13,8 +13,8 @@ class Settings(object):
         self.all_watch_interval = 0
         self.loggedin = False
         self.username = ""
-        self.max_retries = 5
-        self.wait_seconds = 5
+        self.max_retries = 10
+        self.wait_seconds = 10
         self.load_settings()
 
     def load_settings(self):

@@ -2,23 +2,21 @@
 import os
 import io
 import random
-import logging
 from flask import render_template, abort, send_file
-from src.helpers.settings import Settings # pylint: disable=import-error
-from src.helpers.metrics import Metrics # pylint: disable=import-error
-from src.helpers import paths # pylint: disable=import-error
 from wand.image import Image
 from wand.resource import limits
+from src.helpers.app import AppHelper # pylint: disable=import-error
+from src.helpers import paths # pylint: disable=import-error
 
-def add_photo_page(app, app_metrics:Metrics, configs:Settings):
+def add_photo_page(app, app_helper:AppHelper):
     """ Add Home Page """
     @app.route("/photo")
     @app.route('/photo/<int:refresh>')
     def photo_page(refresh=900):
         """ Photo Page """
-        app_metrics.counter__requests__photo_page.inc()
+        app_helper.prom_metrics.counter__requests__photo_page.inc()
         try:
-            disk_photos = paths.get_files_on_disk(configs.photo_location)
+            disk_photos = paths.get_files_on_disk(app_helper.configs.photo_location)
             photo = random.choice(list(disk_photos.keys()))
             return render_template('photo.html', URL=photo)
         except:
@@ -27,14 +25,14 @@ def add_photo_page(app, app_metrics:Metrics, configs:Settings):
     @app.route('/photo/<string:filename>')
     def photo_contents(filename=""):
         if filename == "":
-            app_metrics.counter__error__404.inc()
+            app_helper.prom_metrics.counter__error__404.inc()
             abort(404)
-        disk_photos = paths.get_files_on_disk(configs.photo_location)
+        disk_photos = paths.get_files_on_disk(app_helper.configs.photo_location)
         if  filename not in disk_photos:
-            app_metrics.counter__error__404.inc()
+            app_helper.prom_metrics.counter__error__404.inc()
             abort(404)
         if not os.path.isfile(disk_photos[filename]['file_path']):
-            app_metrics.counter__error__404.inc()
+            app_helper.prom_metrics.counter__error__404.inc()
             abort(404)
             
         # Use 1GB of ram before writing temp data to disk.

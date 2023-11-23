@@ -14,10 +14,10 @@ app = Flask(__name__)
 
 app_helper = AppHelper(app)
 
-home_page.add_home_page(app, app_helper.prom_metrics, app_helper.configs)
-photo_page.add_photo_page(app, app_helper.prom_metrics, app_helper.configs)
-sync_status.add_sync_status_pages(app, app_helper.icloud_helper, app_helper.configs, app_helper.sync_handler)
-settings_page.add_settings_pages(app, app_helper.prom_metrics, app_helper.configs, app_helper.icloud_helper)
+home_page.add_home_page(app, app_helper)
+photo_page.add_photo_page(app, app_helper)
+sync_status.add_sync_status_pages(app, app_helper)
+settings_page.add_settings_pages(app, app_helper)
 
 # Add prometheus wsgi middleware to route /metrics requests
 app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {

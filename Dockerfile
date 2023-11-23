@@ -11,6 +11,9 @@ COPY requirements.txt requirements.txt
 # Define environment veriables
 ENV TZ="Europe/London"
 
+# Create Environment veriable logging level
+ENV LOG_LEVEL="INFO"
+
 #Make icloud directory
 RUN mkdir /icloudpd
 

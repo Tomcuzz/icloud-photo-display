@@ -1,4 +1,5 @@
 """ Code to run icloud photo display """
+import os
 import logging
 from flask import Flask
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
@@ -23,4 +24,16 @@ app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
     '/metrics': make_wsgi_app()
 })
 
-app.logger.setLevel(logging.INFO)
+LOG_LEVEL = str(os.getenv("LOG-LEVEL", "INFO"))
+if LOG_LEVEL == "DEBUG":
+    app.logger.setLevel(logging.DEBUG)
+elif LOG_LEVEL == "INFO":
+    app.logger.setLevel(logging.INFO)
+elif LOG_LEVEL == "WARNING":
+    app.logger.setLevel(logging.WARNING)
+elif LOG_LEVEL == "ERROR":
+    app.logger.setLevel(logging.ERROR)
+elif LOG_LEVEL == "CRITICAL":
+    app.logger.setLevel(logging.CRITICAL)
+else:
+    app.logger.setLevel(logging.INFO)

@@ -264,6 +264,8 @@ class ICloud(object):
                         photo_status[photo.filename] = save_item
                 else:
                     self.app.flask_app.logger("Photo Album '" + album + "' not found")
+                # Break as we now got to end of sync and dont need to retry
+                break
             except exceptions.PyiCloudAPIResponseError as err:
                 self.app.prom_metrics.counter__icloud__errors.inc()
                 if "Invalid global session" in str(err):

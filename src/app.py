@@ -24,7 +24,7 @@ app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
     '/metrics': make_wsgi_app()
 })
 
-LOG_LEVEL = str(os.getenv("LOG-LEVEL", "INFO"))
+LOG_LEVEL = str(os.getenv("LOG_LEVEL", "INFO"))
 if LOG_LEVEL == "DEBUG":
     app.logger.setLevel(logging.DEBUG)
 elif LOG_LEVEL == "INFO":

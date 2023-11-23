@@ -1,10 +1,7 @@
-import logging
 from time import sleep
 from datetime import datetime
-from threading import Thread, Lock
+from threading import Thread
 from src.helpers.app import AppHelper # pylint: disable=import-error
-from src.helpers.icloud import ICloud # pylint: disable=import-error
-from src.helpers.settings import Settings # pylint: disable=import-error
 
 class SyncHandler(object):
     def __init__(self, app:AppHelper):
@@ -21,28 +18,26 @@ class SyncHandler(object):
 
     def start_album_sync_if_not_running(self) -> bool:
         if not self.sync_runner.is_alive():
-            logging.warning("Starting new sync thread for album")
+            self.app.flask_app.logger.warning("Starting new sync thread for album")
             self.sync_runner = SyncThread(self.app)
             self.sync_runner.album_waiting = True
             self.sync_runner.start()
             return True
-        else:
-            logging.warning("Using existing sync thread for album")
-            self.sync_runner.album_waiting = True
-            return False
+        self.app.flask_app.logger.warning("Using existing sync thread for album")
+        self.sync_runner.album_waiting = True
+        return False
 
     def start_all_sync_if_not_running(self) -> bool:
         if not self.sync_runner.is_alive():
-            logging.warning("Starting new sync thread for all")
+            self.app.flask_app.logger.warning("Starting new sync thread for all")
             self.sync_runner = SyncThread(self.app)
             self.sync_runner.all_waiting = True
             self.sync_runner.start()
             return True
-        else:
-            logging.warning("Using existing sync thread for all")
-            self.sync_runner.all_waiting = True
-            return False
-    
+        self.app.flask_app.logger.warning("Using existing sync thread for all")
+        self.sync_runner.all_waiting = True
+        return False
+
     def sync_running(self) -> bool:
         return self.sync_runner.is_alive()
 
@@ -51,12 +46,14 @@ class AlbumPeriodicSyncFire(Thread):
         super().__init__()
         self.app = app
         self.sync_handler = sync_handler
-    
+
     def run(self):
         while True:
             if int(self.app.configs.watch_interval) > 0:
                 self.sync_handler.start_album_sync_if_not_running()
-                self.app.prom_metrics.gauge__icloud__next_sync_epoch.labels(SyncName=self.app.configs.icloud_album_name).set((datetime.now().timestamp() + self.app.configs.watch_interval))
+                self.app.prom_metrics.gauge__icloud__next_sync_epoch.labels(
+                    SyncName=self.app.configs.icloud_album_name
+                    ).set((datetime.now().timestamp() + self.app.configs.watch_interval))
                 sleep(int(self.app.configs.watch_interval))
             else:
                 sleep(1800)
@@ -66,12 +63,14 @@ class AllPeriodicSyncFire(Thread):
         super().__init__()
         self.app = app
         self.sync_handler = sync_handler
-    
+
     def run(self):
         while True:
             if int(self.app.configs.all_watch_interval) > 0:
                 self.sync_handler.start_all_sync_if_not_running()
-                self.app.prom_metrics.gauge__icloud__next_sync_epoch.labels(SyncName='All Photos').set((datetime.now().timestamp() + self.app.configs.all_watch_interval))
+                self.app.prom_metrics.gauge__icloud__next_sync_epoch.labels(
+                    SyncName='All Photos'
+                    ).set((datetime.now().timestamp() + self.app.configs.all_watch_interval))
                 sleep(int(self.app.configs.all_watch_interval))
             else:
                 sleep(1800)
@@ -87,12 +86,12 @@ class SyncThread(Thread):
     def run(self):
         while self.all_waiting or self.album_waiting:
             if self.all_waiting:
-                logging.warning("starting all sync")
+                self.app.flask_app.logger.warning("starting all sync")
                 self.all_waiting = False
                 self.app.icloud_helper.sync_album(sync_all_photos=True)
-                logging.warning("finished all sync")
+                self.app.flask_app.logger.warning("finished all sync")
             if self.album_waiting:
-                logging.warning("starting album sync")
+                self.app.flask_app.logger.warning("starting album sync")
                 self.album_waiting = False
                 self.app.icloud_helper.sync_album()
-                logging.warning("finished album sync")
+                self.app.flask_app.logger.warning("finished album sync")

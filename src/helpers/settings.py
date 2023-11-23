@@ -22,14 +22,22 @@ class Settings(object):
         try:
             file = open(self.config_file, encoding="utf-8")
             data = json.load(file)
-            self.all_photo_location = data['all_photo_location']
-            self.photo_location = data['photo_location']
-            self.cookie_directory = data['cookie_directory']
-            self.all_watch_interval = data['all_watch_interval']
-            self.watch_interval = data['watch_interval']
-            self.icloud_album_name = data['icloud_album_name']
-            self.loggedin = data['logged_in']
-            self.username = data['username']
+            if 'all_photo_location' in data:
+                self.all_photo_location = data['all_photo_location']
+            if 'photo_location' in data:
+                self.photo_location = data['photo_location']
+            if 'cookie_directory' in data:
+                self.cookie_directory = data['cookie_directory']
+            if 'all_watch_interval' in data:
+                self.all_watch_interval = data['all_watch_interval']
+            if 'watch_interval' in data:
+                self.watch_interval = data['watch_interval']
+            if 'icloud_album_name' in data:
+                self.icloud_album_name = data['icloud_album_name']
+            if 'logged_in' in data:
+                self.loggedin = data['logged_in']
+            if 'username' in data:
+                self.username = data['username']
         except Exception as error:
             print('Error loading configs:', error)
 

@@ -28,7 +28,7 @@ class ICloud(object):
 
         if self.app.configs.username:
             try:
-                logging.debug('Cookie directory: ' + self.app.configs.cookie_directory)
+                self.app.flask_app.logger.debug('Cookie directory: ' + self.app.configs.cookie_directory)
                 self.api = base.PyiCloudService(
                     "com",
                     self.app.configs.username.strip(),
@@ -41,13 +41,13 @@ class ICloud(object):
                 return self.api
             except exceptions.NoStoredPasswordAvailable:
                 self.app.prom_metrics.counter__icloud__errors.inc()
-                logging.warning('iCloud password not avalible')
+                self.app.flask_app.logger.warning('iCloud password not avalible')
             except exceptions.PyiCloudFailedLoginException:
                 self.app.prom_metrics.counter__icloud__errors.inc()
-                logging.warning('iCloud Login Failed')
+                self.app.flask_app.logger.warning('iCloud Login Failed')
             except exceptions.PyiCloudServiceNotActivatedErrror:
                 self.app.prom_metrics.counter__icloud__errors.inc()
-                logging.warning('iCloud Not Activated')
+                self.app.flask_app.logger.warning('iCloud Not Activated')
         return None
 
     def update_login(self, password):
@@ -158,7 +158,7 @@ class ICloud(object):
             self.app.prom_metrics.counter__icloud__errors.inc()
             # For later: come up with a nicer message to the user. For now take the
             # exception text
-            logging.warning("Photo album list error: " + err)
+            self.app.flask_app.logger.warning("Photo album list error: " + err)
         self.app.prom_metrics.counter__icloud__errors.inc()
         return False
     
@@ -169,7 +169,7 @@ class ICloud(object):
             created_date = photo.created.astimezone(get_localzone())
         except (ValueError, OSError):
             self.app.prom_metrics.counter__icloud__download_errors.inc()
-            logging.error(
+            self.app.flask_app.logger.error(
                 "Could not convert photo created date to local timezone (%s)",
                 photo.created)
             created_date = photo.created
@@ -199,17 +199,17 @@ class ICloud(object):
             return
         def error_handler(ex, exception_retries):
             self.app.prom_metrics.counter__icloud__download_errors.inc()
-            logging.error("Photo Handler Session error")
+            self.app.flask_app.logger.error("Photo Handler Session error")
             if "Invalid global session" in str(ex):
                 if icloud.api:
                     self.api.authenticate()
             else:
-                logging.error("Photo Handler iCloud API error: " + err)
+                self.app.flask_app.logger.error("Photo Handler iCloud API error: " + err)
         try:
             self.api.photos.exception_handler = error_handler
         except exceptions.PyiCloudAPIResponseError as err:
             self.app.prom_metrics.counter__icloud__errors.inc()
-            logging.error("Photo Handler Setup error: " + err)
+            self.app.flask_app.logger.error("Photo Handler Setup error: " + err)
             error_handler(err, 0)
 
     @property
@@ -264,11 +264,11 @@ class ICloud(object):
             except exceptions.PyiCloudAPIResponseError as err:
                 self.app.prom_metrics.counter__icloud__errors.inc()
                 if "Invalid global session" in str(err):
-                    logging.error("Photo List Get Session error")
+                    self.app.flask_app.logger.error("Photo List Get Session error")
                     if self.api:
                         self.api.authenticate()
                 else:
-                    logging.error("iCloud API error: " + err)
+                    self.app.flask_app.logger.error("iCloud API error: " + err)
         return photo_status
     
     def delete_local_photo(self, name) -> bool:
@@ -294,8 +294,11 @@ class ICloud(object):
         self.app.prom_metrics.enum__icloud__sync_running_status.labels(SyncName=album_name).state('running')
         start = datetime.now()
         self.setup_photo_error_handler()
+        self.app.flask_app.logger.debug("All Sync - Getting statuses")
         photos = self.get_sync_photo_album_status
+        self.app.flask_app.logger.debug("All Sync - Photo Status Recieved")
         for photo in photos.keys():
+            self.app.flask_app.logger.debug("Syncing photo: " + photo)
             self.sync_photo(photo, photos)
         album_name = self.app.configs.icloud_album_name
         end = datetime.now()
@@ -309,8 +312,11 @@ class ICloud(object):
         self.app.prom_metrics.enum__icloud__sync_running_status.labels(SyncName='All Photos').state('running')
         start = datetime.now()
         self.setup_photo_error_handler()
+        self.app.flask_app.logger.debug("All Sync - Getting statuses")
         photos = self.get_sync_photo_all_status
+        self.app.flask_app.logger.debug("All Sync - Photo Status Recieved")
         for photo in photos.keys():
+            self.app.flask_app.logger.debug("Syncing photo: " + photo)
             self.sync_photo(photo, photos)
         end = datetime.now()
         self.app.prom_metrics.gauge__icloud__last_sync_elapse_time.labels(SyncName='All Photos').set((end - start).total_seconds())
@@ -322,10 +328,10 @@ class ICloud(object):
         if self.is_authed:
             self.sync_photo_all()
         else:
-            logging.warning("Tried to sync when not authed to iCloud")
+            self.app.flask_app.logger.warning("Tried to sync when not authed to iCloud")
     
     def sync_album(self):
         if self.is_authed:
             self.sync_photo_album()
         else:
-            logging.warning("Tried to sync when not authed to iCloud")
+            self.app.flask_app.logger.warning("Tried to sync when not authed to iCloud")

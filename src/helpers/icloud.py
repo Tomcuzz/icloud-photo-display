@@ -291,6 +291,7 @@ class ICloud(object):
 
     def sync_photo_album(self):
         """ Download missing photos to local path """
+        album_name = self.app.configs.icloud_album_name
         self.app.prom_metrics.enum__icloud__sync_running_status.labels(SyncName=album_name).state('running')
         start = datetime.now()
         self.setup_photo_error_handler()
@@ -300,7 +301,6 @@ class ICloud(object):
         for photo in photos.keys():
             self.app.flask_app.logger.debug("Syncing photo: " + photo)
             self.sync_photo(photo, photos)
-        album_name = self.app.configs.icloud_album_name
         end = datetime.now()
         self.app.prom_metrics.gauge__icloud__last_sync_elapse_time.labels(SyncName=album_name).set((end - start).total_seconds())
         self.app.prom_metrics.gauge__icloud__last_sync_epoch.labels(SyncName=album_name).set(end.timestamp())

@@ -291,6 +291,7 @@ class ICloud(object):
 
     def sync_photo_album(self):
         """ Download missing photos to local path """
+        self.metrics.enum__icloud__sync_running_status.labels(SyncName=album_name).state('running')
         start = datetime.now()
         self.setup_photo_error_handler()
         photos = self.get_sync_photo_album_status
@@ -300,10 +301,12 @@ class ICloud(object):
         end = datetime.now()
         self.metrics.gauge__icloud__last_sync_elapse_time.labels(SyncName=album_name).set((end - start).total_seconds())
         self.metrics.gauge__icloud__last_sync_epoch.labels(SyncName=album_name).set(end.timestamp())
+        self.metrics.enum__icloud__sync_running_status.labels(SyncName=album_name).state('waiting')
         self.run_metric_collect()
 
     def sync_photo_all(self):
         """ Download missing photos to local path """
+        self.metrics.enum__icloud__sync_running_status.labels(SyncName='All Photos').state('running')
         start = datetime.now()
         self.setup_photo_error_handler()
         photos = self.get_sync_photo_all_status
@@ -312,6 +315,7 @@ class ICloud(object):
         end = datetime.now()
         self.metrics.gauge__icloud__last_sync_elapse_time.labels(SyncName='All Photos').set((end - start).total_seconds())
         self.metrics.gauge__icloud__last_sync_epoch.labels(SyncName='All Photos').set(end.timestamp())
+        self.metrics.enum__icloud__sync_running_status.labels(SyncName='All Photos').state('waiting')
         self.run_metric_collect()
     
     def sync_all(self):

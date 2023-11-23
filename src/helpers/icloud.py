@@ -233,6 +233,8 @@ class ICloud(object):
         """ Get photo sync status """
         if not self.is_authed:
             self.app.prom_metrics.counter__icloud__errors.inc()
+            self.app.flask_app.logger.warning(
+                "get_album_sync_photo_album_status: Icloud not logged in")
             return {}
         self.setup_photo_error_handler()
         photo_status = {}
@@ -240,6 +242,8 @@ class ICloud(object):
         for i in range(3):
             try:
                 if album in self.api.photos.albums:
+                    self.app.flask_app.logger.warning(
+                        "Album sync - Album '" + album + "' found")
                     for photo in self.api.photos.albums[album]:
                         if photo.item_type not in ("image"):
                             continue

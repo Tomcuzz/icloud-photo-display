@@ -1,14 +1,9 @@
 """ iCloud api connection helpers """
 import os
-import piexif
-import logging
 from datetime import datetime
-from piexif._exceptions import InvalidImageDataError
 from tzlocal import get_localzone
 from src.helpers.app import AppHelper # pylint: disable=import-error
 from src.pyicloud_ipd import utils, base, exceptions # pylint: disable=import-error
-from src.helpers.settings import Settings # pylint: disable=import-error
-from src.helpers.metrics import Metrics # pylint: disable=import-error
 from src.helpers import exif, download, paths # pylint: disable=import-error
 
 class ICloud(object):

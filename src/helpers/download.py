@@ -105,7 +105,7 @@ def download_media(icloud, photo, download_path, size) -> bool:
                 logging.error("Session error")
             else:
                 # you end up here when p.e. throttling by Apple happens
-                wait_time = (retries + 1) * icloud.app.configs.wait_seconds
+                wait_time = icloud.app.configs.wait_seconds * (retries + 1) * (retries + 1)
                 logging.error(
                     "Error downloading %s, retrying after %s seconds...",
                     photo.filename,

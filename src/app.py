@@ -11,7 +11,7 @@ from src.helpers.app import AppHelper
 
 app = Flask(__name__)
 
-app_helper = AppHelper()
+app_helper = AppHelper(app)
 
 home_page.add_home_page(app, app_helper.prom_metrics, app_helper.configs)
 photo_page.add_photo_page(app, app_helper.prom_metrics, app_helper.configs)

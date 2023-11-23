@@ -26,14 +26,20 @@ app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
 
 LOG_LEVEL = str(os.getenv("LOG_LEVEL", "INFO"))
 if LOG_LEVEL == "DEBUG":
+    print("Logging set to: " + LOG_LEVEL)
     app.logger.setLevel(logging.DEBUG)
 elif LOG_LEVEL == "INFO":
+    print("Logging set to: " + LOG_LEVEL)
     app.logger.setLevel(logging.INFO)
 elif LOG_LEVEL == "WARNING":
+    print("Logging set to: " + LOG_LEVEL)
     app.logger.setLevel(logging.WARNING)
 elif LOG_LEVEL == "ERROR":
+    print("Logging set to: " + LOG_LEVEL)
     app.logger.setLevel(logging.ERROR)
 elif LOG_LEVEL == "CRITICAL":
+    print("Logging set to: " + LOG_LEVEL)
     app.logger.setLevel(logging.CRITICAL)
 else:
+    print("ERROR: Unknown Logging level, level set to: INFO")
     app.logger.setLevel(logging.INFO)

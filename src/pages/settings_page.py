@@ -27,14 +27,14 @@ def add_settings_pages(app, app_helper:AppHelper):
                 app_helper.configs.save_settings()
                 return render_template(
                     'settings.html',
-                    configs=app_helper.configs,
+                    Configs=app_helper.configs,
                     ICloud=app_helper.icloud_helper,
                     Settings_error="iCloud Album Doesn't exist")
             return redirect(url_for('home_page'))
         elif request.method == 'POST':
             return render_template(
                 'settings.html',
-                configs=app_helper.configs,
+                Configs=app_helper.configs,
                 ICloud=app_helper.icloud_helper,
                 Settings_error="A Required Field Was Not Provided")
 
@@ -49,7 +49,7 @@ def add_settings_pages(app, app_helper:AppHelper):
         if not (request.form['user'] != "" and request.form['pass'] != ""):
             return render_template(
                 'settings.html',
-                configs=app_helper.configs,
+                Configs=app_helper.configs,
                 ICloud=app_helper.icloud_helper,
                 ICloud_error="iCloud Credenials Not Provided")
         app_helper.configs.username = request.form['user']
@@ -58,7 +58,7 @@ def add_settings_pages(app, app_helper:AppHelper):
         if not app_helper.icloud_helper.has_password:
             return render_template(
                 'settings.html',
-                configs=app_helper.configs,
+                Configs=app_helper.configs,
                 ICloud=app_helper.icloud_helper,
                 ICloud_error="iCloud Login Failed")
         if app_helper.icloud_helper.needs_2fa_setup:

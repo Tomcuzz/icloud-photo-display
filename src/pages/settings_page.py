@@ -40,7 +40,7 @@ def add_settings_pages(app, app_helper:AppHelper):
 
         return render_template(
             'settings.html',
-            configs=app_helper.configs,
+            Configs=app_helper.configs,
             ICloud=app_helper.icloud_helper)
 
     @app.route("/settings/login", methods=['POST'])

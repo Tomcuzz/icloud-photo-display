@@ -38,5 +38,5 @@ spec:
           claimName: icloudphoto-keyring-pvc
       - name: mass-storage
         nfs:
-          server: 10.0.10.254
+          server: 10.0.10.47
           path: /icloud-photo-backup

@@ -293,11 +293,11 @@ class ICloud(object):
                 else:
                     self.app.flask_app.logger.error("iCloud API error: " + err)
         self.app.prom_metrics.gauge__icloud__photo_sync_state.labels(
-                SyncName=album_name, status="file_synced").set(file_synced)
+                SyncName=album, status="file_synced").set(file_synced)
         self.app.prom_metrics.gauge__icloud__photo_sync_state.labels(
-                SyncName=album_name, status="file_change").set(file_change_num)
+                SyncName=album, status="file_change").set(file_change_num)
         self.app.prom_metrics.gauge__icloud__photo_sync_state.labels(
-                SyncName=album_name, status="not_existent").set(file_does_not_exist_num)
+                SyncName=album, status="not_existent").set(file_does_not_exist_num)
         return photo_status
 
     def delete_local_photo(self, name) -> bool:

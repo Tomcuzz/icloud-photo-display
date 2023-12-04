@@ -308,6 +308,7 @@ class ICloud(object):
             photos = self.get_sync_photo_album_status
         if name in photos:
             if photos[name]['status'] == "non-existent":
+                self.app.flask_app.logger.debug("Downloading photo: " + photos[name]['photo'])
                 return self.download_photo(photos[name]['photo'], photos[name]['local_path'])
         return True
 

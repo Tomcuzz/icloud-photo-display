@@ -337,6 +337,10 @@ class ICloud(object):
                     self.app.prom_metrics.gauge__icloud__sync_errors.labels(
                         SyncName=album_name).inc()
                     self.app.flask_app.logger.warning("Reached max download attempts")
+                    self.app.prom_metrics.enum__icloud__sync_running_status.labels(
+                        SyncName=album_name).state('waiting')
+                    self.app.prom_metrics.gauge__icloud__sync_errors.labels(
+                        SyncName=album_name).set(0)
                     return
             end = datetime.now()
             self.app.prom_metrics.gauge__icloud__last_sync_elapse_time.labels(

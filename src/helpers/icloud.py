@@ -163,7 +163,7 @@ class ICloud(object):
         return False
 
     def download_photo(self, photo, download_path) -> bool:
-        """ Given a path download a photo from iCloud """
+        """ Given a path download a photo from iCloud, returns True if download is successful. """
         self.setup_photo_error_handler()
         try:
             created_date = photo.created.astimezone(get_localzone())
@@ -190,6 +190,7 @@ class ICloud(object):
             download.set_utime(download_path, created_date)
         else:
             self.app.prom_metrics.counter__icloud__download_errors.inc()
+        return download_result
 
     def setup_photo_error_handler(self):
         if not self.is_authed:
@@ -300,14 +301,16 @@ class ICloud(object):
                 return True
         return False
 
-    def sync_photo(self, name, photos=None):
-        """ Download photo to local path """
+    def sync_photo(self, name, photos=None) -> bool:
+        """ Download photo to local path, returns True if no errors. """
         self.setup_photo_error_handler()
         if photos is None:
             photos = self.get_sync_photo_album_status
         if name in photos:
             if photos[name]['status'] == "non-existent":
-                self.download_photo(photos[name]['photo'], photos[name]['local_path'])
+                return self.download_photo(photos[name]['photo'], photos[name]['local_path'])
+        return True
+
 
     def sync_album(self, sync_all_photos=False):
         """ Download missing photos to local path """
@@ -324,9 +327,16 @@ class ICloud(object):
             self.app.flask_app.logger.debug(album_name + " Sync - Getting statuses")
             photos = self.get_album_sync_photo_album_status(album_name, download_path)
             self.app.flask_app.logger.debug(album_name + " Sync - Photo Status Recieved")
+            download_failures = 0
             for photo in photos:
                 self.app.flask_app.logger.debug("Syncing photo: " + photo)
-                self.sync_photo(photo, photos)
+                if not self.sync_photo(photo, photos):
+                    download_failures += 1
+                if download_failures > self.app.configs.max_download_attempts:
+                    self.app.prom_metrics.gauge__icloud__sync_errors.labels(
+                        SyncName=album_name).inc()
+                    self.app.flask_app.logger.warning("Reached max download attempts")
+                    return
             end = datetime.now()
             self.app.prom_metrics.gauge__icloud__last_sync_elapse_time.labels(
                 SyncName=album_name).set((end - start).total_seconds())
@@ -334,6 +344,8 @@ class ICloud(object):
                 SyncName=album_name).set(end.timestamp())
             self.app.prom_metrics.enum__icloud__sync_running_status.labels(
                 SyncName=album_name).state('waiting')
+            self.app.prom_metrics.gauge__icloud__sync_errors.labels(
+                SyncName=album_name).set(0)
             self.run_metric_collect()
         else:
             self.app.flask_app.logger.warning("Tried to sync when not authed to iCloud")

@@ -81,7 +81,7 @@ def download_response_to_path_dry_run(
 
 # pylint: disable-msg=too-many-arguments
 def download_media(icloud, photo, download_path, size) -> bool:
-    """Download the photo to path, with retries and error handling"""
+    """Download the photo to path, with retries and error handling, returns True if download is successful."""
     if not mkdirs_for_path(download_path):
         return False
 

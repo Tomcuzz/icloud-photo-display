@@ -9,6 +9,7 @@ class Metrics(object):
         self.gauge__icloud__next_sync_epoch = Gauge("icloud_next_sync_epoch", "Epoch of the next sync", ["SyncName"])
         self.gauge__icloud__last_sync_epoch = Gauge("icloud_last_sync_epoch", "Epoch of the last sync", ["SyncName"])
         self.gauge__icloud__last_sync_elapse_time = Gauge("icloud_sync_elapse_time", "Number of seconds the sync took", ["SyncName"])
+        self.gauge__icloud__sync_errors = Gauge("icloud_sync_errors", "Number of Sync errros", ["SyncName"])
 
         self.enum__icloud__sync_running_status = Enum("icloud_sync_running_status", "Current sync running status", ["SyncName"], states=['waiting', 'running'])
 

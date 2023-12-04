@@ -13,8 +13,9 @@ class Settings(object):
         self.all_watch_interval = 0
         self.loggedin = False
         self.username = ""
-        self.max_retries = 10
+        self.max_retries = 5
         self.wait_seconds = 10
+        self.max_download_attempts = 20
         self.load_settings()
 
     def load_settings(self):

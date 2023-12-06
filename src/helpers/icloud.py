@@ -114,8 +114,11 @@ class ICloud(object):
     def get_trusted_devices(self) -> list:
         """ List Trused 2fa devices """
         trusted_devices = []
-        for i in range(len(self.api.trusted_devices)):
-            trusted_devices.append(self.describe_trusted_device(i))
+        try:
+            for i in range(len(self.api.trusted_devices)):
+                trusted_devices.append(self.describe_trusted_device(i))
+        except exceptions.PyiCloudAPIResponseError as err:
+            self.app.flask_app.logger.warning("Recieved API error:" + err)
         return trusted_devices
 
     def describe_trusted_device(self, device_id:int) -> str:

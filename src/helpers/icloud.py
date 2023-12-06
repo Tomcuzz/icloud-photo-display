@@ -345,11 +345,12 @@ class ICloud(object):
             if photos[name]['status'] == "non-existent":
                 self.app.flask_app.logger.debug("Downloading photo: " + name)
                 return self.download_photo(photos[name]['photo'], photos[name]['local_path'])
-            elif photos[name]['status'] == "file-change":
-                self.app.flask_app.logger.debug("Deleting photo: " + name)
-                return self.delete_local_photo(name, photos)
-                self.app.flask_app.logger.debug("Downloading photo: " + name)
-                return self.download_photo(photos[name]['photo'], photos[name]['local_path'])
+            # Disabling till multiple photos with same name issue fixed
+            # elif photos[name]['status'] == "file-change":
+            #     self.app.flask_app.logger.debug("Deleting photo: " + name)
+            #     return self.delete_local_photo(name, photos)
+            #     self.app.flask_app.logger.debug("Downloading photo: " + name)
+            #     return self.download_photo(photos[name]['photo'], photos[name]['local_path'])
         return True
 
 

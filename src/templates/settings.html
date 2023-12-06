@@ -96,7 +96,7 @@
 		</tr>
 		<tr>
 			<th scope="row">Has Password</th>
-			<th scope="row">{{ ICloud.has_password }}</th>
+			<th scope="row">{{ ICloud.has_password }} {% if ICloud.has_password %}<a href="/settings/logout" class="btn btn-danger">Logout</a>{% endif %}</th>
 		</tr>
 		<tr>
 			<th scope="row"> 2FA Setup</th>
@@ -108,7 +108,7 @@
 					<br>
 					<a href="/settings/2fa" class="btn btn-success">Setup 2FA</a>
 				{% else %}
-					True
+					True <a href="/settings/delete2fa" class="btn btn-danger">Delete 2FA Keys</a>
 				{% endif %}
 			</th>
 		</tr>
@@ -120,20 +120,6 @@
 			<th scope="row">Authentication Passed</th>
 			<th scope="row">{{ ICloud.is_authed }}</th>
 		</tr>
-		{% if ICloud.has_password %}
-			<tr>
-				<th scope="row">Delete 2fa keys</th>
-				<th scope="row">
-					<a href="/settings/delete2fa" class="btn btn-danger">Delete 2FA</a>
-				</th>
-			</tr>
-			<tr>
-				<th scope="row">Logout</th>
-				<th scope="row">
-					<a href="/settings/logout" class="btn btn-danger">Logout</a>
-				</th>
-			</tr>
-		{% endif %}
 	</tbody>
 </table>
 

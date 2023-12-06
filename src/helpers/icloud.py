@@ -105,11 +105,7 @@ class ICloud(object):
                     exparation = datetime.utcfromtimestamp(expires)
         return exparation
 
-    def logout(self):
-        """ Logout of iCloud. """
-        utils.delete_password_in_keyring(self.app.configs.username)
-        self.app.configs.username = ""
-        self.app.configs.save_settings()
+    def remove_cookies(self):
         if self.app.configs.cookie_directory != "":
             for filename in os.listdir(self.app.configs.cookie_directory):
                 file_path = os.path.join(self.app.configs.cookie_directory, filename)
@@ -120,6 +116,13 @@ class ICloud(object):
                         shutil.rmtree(file_path)
                 except Exception as e:
                     print('Failed to delete %s. Reason: %s' % (file_path, e))
+
+    def logout(self):
+        """ Logout of iCloud. """
+        utils.delete_password_in_keyring(self.app.configs.username)
+        self.app.configs.username = ""
+        self.app.configs.save_settings()
+        self.remove_cookies()
 
     def run_metric_collect(self):
         """ Function to Collect metrics and export them. """

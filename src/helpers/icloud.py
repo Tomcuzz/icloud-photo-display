@@ -1,5 +1,6 @@
 """ iCloud api connection helpers """
 import os
+import shutil
 from datetime import datetime
 from tzlocal import get_localzone
 from src.helpers.app import AppHelper # pylint: disable=import-error
@@ -103,6 +104,22 @@ class ICloud(object):
                 if expires is not None:
                     exparation = datetime.utcfromtimestamp(expires)
         return exparation
+
+    def logout(self):
+        """ Logout of iCloud. """
+        self.api.delete_password_in_keyring(self.app.configs.username)
+        self.app.configs.username = ""
+        if self.app.configs.cookie_directory != "":
+            for filename in os.listdir(self.app.configs.cookie_directory):
+                file_path = os.path.join(self.app.configs.cookie_directory, filename)
+                try:
+                    if os.path.isfile(file_path) or os.path.islink(file_path):
+                        os.unlink(file_path)
+                    elif os.path.isdir(file_path):
+                        shutil.rmtree(file_path)
+                except Exception as e:
+                    print('Failed to delete %s. Reason: %s' % (file_path, e))
+        self.app.configs.save_settings()
 
     def run_metric_collect(self):
         """ Function to Collect metrics and export them. """

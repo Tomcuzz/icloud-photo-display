@@ -120,6 +120,12 @@
 			<th scope="row">Authentication Passed</th>
 			<th scope="row">{{ ICloud.is_authed }}</th>
 		</tr>
+		{% if not ICloud.has_password %}
+			<tr>
+				<th scope="row">Logout</th>
+				<a href="/settings/2fa" class="btn btn-danger">Logout</a>
+			</tr>
+		{% endif %}
 	</tbody>
 </table>
 

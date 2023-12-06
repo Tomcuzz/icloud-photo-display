@@ -118,7 +118,7 @@ class ICloud(object):
             for i in range(len(self.api.trusted_devices)):
                 trusted_devices.append(self.describe_trusted_device(i))
         except exceptions.PyiCloudAPIResponseError as err:
-            self.app.flask_app.logger.warning("Recieved API error:" + err)
+            self.app.flask_app.logger.warning("Recieved API error:" + err.reason)
         return trusted_devices
 
     def describe_trusted_device(self, device_id:int) -> str:

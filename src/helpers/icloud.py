@@ -107,7 +107,7 @@ class ICloud(object):
 
     def logout(self):
         """ Logout of iCloud. """
-        self.api.delete_password_in_keyring(self.app.configs.username)
+        utils.delete_password_in_keyring(self.app.configs.username)
         self.app.configs.username = ""
         self.app.configs.save_settings()
         if self.app.configs.cookie_directory != "":

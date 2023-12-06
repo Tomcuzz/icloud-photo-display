@@ -82,6 +82,10 @@
 </table>
 <br>
 <h2>iCloud Status</h2>
+{% if ICloud.has_password %}
+	<a href="/settings/delete2fa" class="btn btn-danger">Delete 2FA</a>
+	<a href="/settings/logout" class="btn btn-danger">Logout</a>
+{% endif %}
 <table class="table">
 	<thead>
 		<tr>
@@ -120,12 +124,6 @@
 			<th scope="row">Authentication Passed</th>
 			<th scope="row">{{ ICloud.is_authed }}</th>
 		</tr>
-		{% if ICloud.has_password %}
-			<tr>
-				<th scope="row">Logout</th>
-				<a href="/settings/logout" class="btn btn-danger">Logout</a>
-			</tr>
-		{% endif %}
 	</tbody>
 </table>
 

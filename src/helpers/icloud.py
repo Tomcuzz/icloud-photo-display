@@ -370,7 +370,7 @@ class ICloud(object):
             self.app.flask_app.logger.debug(album_name + " Sync - Photo Status Recieved")
             download_failures = 0
             for photo in photos:
-                self.app.flask_app.logger.debug("Syncing photo: " + photo)
+                self.app.flask_app.logger.debug("Syncing photo: " + photo + " with id: " + photos[name]['photo'].id)
                 if not self.sync_photo(photo, photos):
                     download_failures += 1
                 if download_failures > self.app.configs.max_download_attempts:

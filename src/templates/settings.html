@@ -124,6 +124,20 @@
 			<th scope="row">Authentication Passed</th>
 			<th scope="row">{{ ICloud.is_authed }}</th>
 		</tr>
+		{% if ICloud.has_password %}
+			<tr>
+				<th scope="row">Delete 2fa keys</th>
+				<th scope="row">
+					<a href="/settings/delete2fa" class="btn btn-danger">Delete 2FA</a>
+				</th>
+			</tr>
+			<tr>
+				<th scope="row">Logout</th>
+				<th scope="row">
+					<a href="/settings/logout" class="btn btn-danger">Logout</a>
+				</th>
+			</tr>
+		{% endif %}
 	</tbody>
 </table>
 

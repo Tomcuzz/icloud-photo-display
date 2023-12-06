@@ -260,6 +260,7 @@ class ICloud(object):
         file_synced = 0
         file_change_num = 0
         file_does_not_exist_num = 0
+        file_name_duplicated_num = 0
         files_on_disk = paths.get_files_on_disk(photo_location)
         for i in range(3):
             try:
@@ -302,7 +303,13 @@ class ICloud(object):
                                 album + " sync - Photo '" + photo.filename + "' file-does-not-exist")
                             file_does_not_exist_num += 1
 
-                        photo_status[photo.filename] = save_item
+                        if photo.filename in photo_status:
+                            file_name_duplicated_num += 1
+                            photo_status[photo.filename]['status'] = "file-name-duplicated"
+                            self.app.flask_app.logger.debug(
+                                album + " sync - Photo '" + photo.filename + "' file-name-duplicated" + " with id: " + photo.id)
+                        else:
+                            photo_status[photo.filename] = save_item
                 else:
                     self.app.flask_app.logger("Photo Album '" + album + "' not found")
                 # Break as we now got to end of sync and dont need to retry
@@ -321,6 +328,9 @@ class ICloud(object):
                 SyncName=album, status="file_change").set(file_change_num)
         self.app.prom_metrics.gauge__icloud__photo_sync_state.labels(
                 SyncName=album, status="not_existent").set(file_does_not_exist_num)
+        self.app.prom_metrics.gauge__icloud__photo_sync_state.labels(
+                SyncName=album, status="file_name_duplicated").set(file_name_duplicated_num)
+        
         return photo_status
 
     def delete_local_photo(self, name, photos=None) -> bool:

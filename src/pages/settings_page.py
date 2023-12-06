@@ -70,6 +70,12 @@ def add_settings_pages(app, app_helper:AppHelper):
         """ 2FA Page """
         return render_template('2fa_select.html', Devices=app_helper.icloud_helper.get_trusted_devices())
 
+    @app.route("/settings/logout")
+    def settings_logout_page():
+        """ Logout Page """
+        app_helper.icloud_helper.logout()
+        return redirect(url_for('settings_page'))
+
     @app.route("/settings/2fa/<int:device>")
     def settings_2fa_request_page(device):
         """ 2FA Page """

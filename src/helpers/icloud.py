@@ -289,12 +289,12 @@ class ICloud(object):
                                 # Looks like files changed.... delete and recreate
                                 save_item['status'] = "file-change"
                                 self.app.flask_app.logger.debug(
-                                    album + " sync - Photo '" + photo.filename + "' file-change")
+                                    album + " sync - Photo '" + photo.filename + "' file-change" + " with id: " + photos.id)
                                 file_change_num += 1
                             else:
                                 save_item['status'] = "file-downloaded"
                                 self.app.flask_app.logger.debug(
-                                    album + " sync - Photo '" + photo.filename + "' file-exists")
+                                    album + " sync - Photo '" + photo.filename + "' file-exists" + " with id: " + photos.id)
                                 file_synced += 1
                         else:
                             save_item['status'] = "non-existent"
@@ -370,7 +370,7 @@ class ICloud(object):
             self.app.flask_app.logger.debug(album_name + " Sync - Photo Status Recieved")
             download_failures = 0
             for photo in photos:
-                self.app.flask_app.logger.debug("Syncing photo: " + photo + " with id: " + photos[name]['photo'].id)
+                self.app.flask_app.logger.debug("Syncing photo: " + photo)
                 if not self.sync_photo(photo, photos):
                     download_failures += 1
                 if download_failures > self.app.configs.max_download_attempts:

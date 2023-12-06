@@ -323,7 +323,7 @@ class ICloud(object):
                 SyncName=album, status="not_existent").set(file_does_not_exist_num)
         return photo_status
 
-    def delete_local_photo(self, name) -> bool:
+    def delete_local_photo(self, name, photos=None) -> bool:
         """ Delete a local photo """
         photos = self.get_sync_photo_album_status
         if name in photos:
@@ -343,6 +343,11 @@ class ICloud(object):
             photos = self.get_sync_photo_album_status
         if name in photos:
             if photos[name]['status'] == "non-existent":
+                self.app.flask_app.logger.debug("Downloading photo: " + name)
+                return self.download_photo(photos[name]['photo'], photos[name]['local_path'])
+            elif photos[name]['status'] == "file-change":
+                self.app.flask_app.logger.debug("Deleting photo: " + name)
+                return self.delete_local_photo(name, photos)
                 self.app.flask_app.logger.debug("Downloading photo: " + name)
                 return self.download_photo(photos[name]['photo'], photos[name]['local_path'])
         return True

@@ -1,10 +1,9 @@
 """Get/set EXIF dates from photos"""
 
-import piexif
 import logging
+import piexif
 
 from piexif._exceptions import InvalidImageDataError
-from pyicloud_ipd import utils, base, exceptions
 
 
 def get_photo_exif(path):

@@ -12,4 +12,4 @@ prometheus-client
 requests
 urllib3
 wand
-pyicloud-ipd
+icloudpd

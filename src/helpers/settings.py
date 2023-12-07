@@ -1,7 +1,7 @@
 """ Module to store settings """
 import json
 
-class Settings(object):
+class Settings(): # pylint: disable=too-many-instance-attributes
     """ Settins storage class """
     def __init__(self, working_dir, config_file):
         self.config_file = working_dir + "/" + config_file
@@ -39,7 +39,7 @@ class Settings(object):
                 self.loggedin = data['logged_in']
             if 'username' in data:
                 self.username = data['username']
-        except Exception as error:
+        except Exception as error: # pylint: disable=broad-exception-caught
             print('Error loading configs:', error)
 
     def save_settings(self):
@@ -58,5 +58,5 @@ class Settings(object):
             settings_json = json.dumps(settings_dict)
             file = open(self.config_file,"w", encoding="utf-8")
             file.write(settings_json)
-        except Exception as error:
+        except Exception as error: # pylint: disable=broad-exception-caught
             print('Error loading configs:', error)

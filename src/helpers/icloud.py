@@ -320,15 +320,18 @@ class ICloud(object):
         file_change_num = 0
         file_does_not_exist_num = 0
         file_name_duplicated_num = 0
+        file_unkown_state = 0
         for name in photo_status:
-            if photo_status[name]['status'] == "file-downloaded"
+            if photo_status[name]['status'] == "file-downloaded":
                 file_synced += 1
-            elif photo_status[name]['status'] == "file-change"
+            elif photo_status[name]['status'] == "file-change":
                 file_change_num += 1
-            elif photo_status[name]['status'] == "non-existent"
+            elif photo_status[name]['status'] == "non-existent":
                 file_does_not_exist_num += 1
-            elif photo_status[name]['status'] == "file-name-duplicated"
+            elif photo_status[name]['status'] == "file-name-duplicated":
                 file_name_duplicated_num += 1
+            else:
+                file_unkown_state += 1
         self.app.prom_metrics.gauge__icloud__photo_sync_state.labels(
                 SyncName=album, status="file_synced").set(file_synced)
         self.app.prom_metrics.gauge__icloud__photo_sync_state.labels(
@@ -337,6 +340,8 @@ class ICloud(object):
                 SyncName=album, status="not_existent").set(file_does_not_exist_num)
         self.app.prom_metrics.gauge__icloud__photo_sync_state.labels(
                 SyncName=album, status="file_name_duplicated").set(file_name_duplicated_num)
+        self.app.prom_metrics.gauge__icloud__photo_sync_state.labels(
+                SyncName=album, status="unkown").set(file_unkown_state)
         
         return photo_status
 

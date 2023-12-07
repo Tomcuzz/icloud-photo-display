@@ -149,7 +149,8 @@ class ICloud(): # pylint: disable=too-many-public-methods
 
     def send_2fa_code(self, device_id:int) -> bool:
         """ Request 2fa code send """
-        if self.api.trusted_devices is None or len(self.api.trusted_devices) < device_id or device_id < 0:
+        if self.api.trusted_devices is None or len(
+            self.api.trusted_devices) < device_id or device_id < 0:
             self.app.prom_metrics.counter__icloud__errors.inc()
             return False
         return self.api.send_verification_code(self.api.trusted_devices[device_id])

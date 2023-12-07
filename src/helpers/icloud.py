@@ -367,6 +367,10 @@ class ICloud(object):
             if photos[name]['status'] == "non-existent":
                 self.app.flask_app.logger.debug("Downloading photo: " + name)
                 return self.download_photo(photos[name]['photo'], photos[name]['local_path'])
+            # Delete File names that are duplicated to clean up duplication bug
+            # elif photos[name]['status'] == "file-name-duplicated":
+            #     self.app.flask_app.logger.debug("Deleting photo: " + name)
+            #     return self.delete_local_photo(name, photos)
             # Disabling till multiple photos with same name issue fixed
             # elif photos[name]['status'] == "file-change":
             #     self.app.flask_app.logger.debug("Deleting photo: " + name)

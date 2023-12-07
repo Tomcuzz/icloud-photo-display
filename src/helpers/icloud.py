@@ -41,10 +41,10 @@ class ICloud(object):
                 self.app.flask_app.logger.warning('iCloud password not avalible')
             except exceptions.PyiCloudFailedLoginException:
                 self.app.prom_metrics.counter__icloud__errors.inc()
-                self.app.flask_app.logger.warning('iCloud Login Failed')
-            except exceptions.PyiCloudServiceNotActivatedErrror:
+                self.app.flask_app.logger.exception('iCloud Login Failed')
+            except exceptions.PyiCloudServiceNotActivatedErrror as e:
                 self.app.prom_metrics.counter__icloud__errors.inc()
-                self.app.flask_app.logger.warning('iCloud Not Activated')
+                self.app.flask_app.logger.warning('iCloud Not Activated', e)
         return None
 
     def update_login(self, password):

@@ -27,9 +27,8 @@ class ICloud(object):
                 self.app.flask_app.logger.debug(
                     'Cookie directory: ' + self.app.configs.cookie_directory)
                 self.api = base.PyiCloudService(
-                    "com",
-                    self.app.configs.username.strip(),
-                    passwd,
+                    apple_id=self.app.configs.username.strip(),
+                    password=passwd,
                     cookie_directory=self.app.configs.cookie_directory
                 )
                 if passwd or not utils.password_exists_in_keyring(self.app.configs.username):

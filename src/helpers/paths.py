@@ -38,6 +38,7 @@ def filename_with_size_and_id(media):
 
 
 def get_files_on_disk(photo_dir):
+    """Return the photo files on disk."""
     to_return = {}
     os.makedirs(name=photo_dir, exist_ok=True)
     for disk_file_name in os.listdir(photo_dir):

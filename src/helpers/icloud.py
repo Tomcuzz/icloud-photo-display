@@ -288,15 +288,31 @@ class ICloud(): # pylint: disable=too-many-public-methods
                             photo_size = version["size"]
                             if str(file_size) != str(photo_size):
                                 # Looks like files changed.... delete and recreate
+                                save_item['status'] = "file-change-with-nonid-name"
+                                self.app.flask_app.logger.debug(
+                                    album + " sync - Photo '" + photo.filename +
+                                    "' file-change-with-nonid-name with id: " + photo.id)
+                            else:
+                                save_item['status'] = "file-downloaded-with-nonid-name"
+                                self.app.flask_app.logger.debug(
+                                    album + " sync - Photo '" + photo.filename +
+                                    "' file-exists-with-nonid-name with id: " + photo.id)
+                        elif paths.filename_with_size_and_id(photo) in files_on_disk:
+                             # for later: this crashes if download-size medium is specified
+                            file_size = files_on_disk[paths.clean_filename(photo.filename)]['size']
+                            version = photo.versions["original"]
+                            photo_size = version["size"]
+                            if str(file_size) != str(photo_size):
+                                # Looks like files changed.... delete and recreate
                                 save_item['status'] = "file-change"
                                 self.app.flask_app.logger.debug(
                                     album + " sync - Photo '" + photo.filename +
-                                    "' file-change" + " with id: " + photo.id)
+                                    "' file-change with id: " + photo.id)
                             else:
                                 save_item['status'] = "file-downloaded"
                                 self.app.flask_app.logger.debug(
                                     album + " sync - Photo '" + photo.filename +
-                                    "' file-exists" + " with id: " + photo.id)
+                                    "' file-exists with id: " + photo.id)
                         else:
                             save_item['status'] = "non-existent"
                             self.app.flask_app.logger.debug(
@@ -325,6 +341,8 @@ class ICloud(): # pylint: disable=too-many-public-methods
 
         file_synced = 0
         file_change_num = 0
+        file_synced_with_nonid_name = 0
+        file_change_num_with_nonid_name = 0
         file_does_not_exist_num = 0
         file_name_duplicated_num = 0
         file_unkown_state = 0
@@ -333,6 +351,10 @@ class ICloud(): # pylint: disable=too-many-public-methods
                 file_synced += 1
             elif status['status'] == "file-change":
                 file_change_num += 1
+            if status['status'] == "file-downloaded-with-nonid-name":
+                file_synced_with_nonid_name += 1
+            elif status['status'] == "file-change-with-nonid-name":
+                file_change_num_with_nonid_name += 1
             elif status['status'] == "non-existent":
                 file_does_not_exist_num += 1
             elif status['status'] == "file-name-duplicated":
@@ -343,6 +365,12 @@ class ICloud(): # pylint: disable=too-many-public-methods
                 SyncName=album, status="file_synced").set(file_synced)
         self.app.prom_metrics.gauge__icloud__photo_sync_state.labels(
                 SyncName=album, status="file_change").set(file_change_num)
+        self.app.prom_metrics.gauge__icloud__photo_sync_state.labels(
+                SyncName=album, status="file_synced_with_nonid_name").set(
+                    file_synced_with_nonid_name)
+        self.app.prom_metrics.gauge__icloud__photo_sync_state.labels(
+                SyncName=album, status="file_change_with_nonid_name").set(
+                    file_change_num_with_nonid_name)
         self.app.prom_metrics.gauge__icloud__photo_sync_state.labels(
                 SyncName=album, status="not_existent").set(file_does_not_exist_num)
         self.app.prom_metrics.gauge__icloud__photo_sync_state.labels(

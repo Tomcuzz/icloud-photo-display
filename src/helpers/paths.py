@@ -34,7 +34,7 @@ def filename_with_size_and_id(media):
     filename = clean_filename(media.filename)
     size = media.versions["original"]["size"]
     clean_id = ''.join(hex(ord(x))[2:] for x in media.id)
-    return str(size) + "-" + clean_id + "-" + filename
+    return '-'.join([str(size), clean_id, filename])
 
 
 def get_files_on_disk(photo_dir):

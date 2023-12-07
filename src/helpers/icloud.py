@@ -7,7 +7,7 @@ from pyicloud_ipd import utils, base, exceptions # pylint: disable=import-error
 from src.helpers.app import AppHelper # pylint: disable=import-error
 from src.helpers import exif, download, paths # pylint: disable=import-error
 
-class ICloud(object):
+class ICloud(): # pylint: disable=too-many-public-methods
     """ iCloud api connection class """
     def __init__(self, app:AppHelper) -> None:
         self.app = app
@@ -105,6 +105,7 @@ class ICloud(object):
         return exparation
 
     def remove_cookies(self):
+        """Remove cookie directory"""
         if self.app.configs.cookie_directory != "":
             for filename in os.listdir(self.app.configs.cookie_directory):
                 file_path = os.path.join(self.app.configs.cookie_directory, filename)
@@ -113,7 +114,7 @@ class ICloud(object):
                         os.unlink(file_path)
                     elif os.path.isdir(file_path):
                         shutil.rmtree(file_path)
-                except Exception as e:
+                except Exception as e: # pylint: disable=broad-exception-caught
                     print('Failed to delete %s. Reason: %s' % (file_path, e))
 
     def logout(self):
@@ -204,28 +205,29 @@ class ICloud(object):
             if False and paths.clean_filename(photo.filename) \
                 .lower().endswith((".jpg", ".jpeg")) and \
                 not exif.get_photo_exif(download_path):
-                    # %Y:%m:%d looks wrong, but it's the correct format
-                    exif.set_photo_exif(
-                        download_path,
-                        created_date.strftime("%Y:%m:%d %H:%M:%S"),
-                    )
+                # %Y:%m:%d looks wrong, but it's the correct format
+                exif.set_photo_exif(
+                    download_path,
+                    created_date.strftime("%Y:%m:%d %H:%M:%S"),
+                )
             download.set_utime(download_path, created_date)
         else:
             self.app.prom_metrics.counter__icloud__download_errors.inc()
         return download_result
 
     def setup_photo_error_handler(self):
+        """Create a photo error handler"""
         if not self.is_authed:
             self.app.prom_metrics.counter__icloud__errors.inc()
             return
-        def error_handler(ex, exception_retries):
+        def error_handler(ex, _):
             self.app.prom_metrics.counter__icloud__download_errors.inc()
             self.app.flask_app.logger.error("Photo Handler Session error")
             if "Invalid global session" in str(ex):
                 if self.api:
                     self.api.authenticate()
             else:
-                self.app.flask_app.logger.error("Photo Handler iCloud API error: " + err)
+                self.app.flask_app.logger.error("Photo Handler iCloud API error")
         try:
             self.api.photos.exception_handler = error_handler
         except exceptions.PyiCloudAPIResponseError as err:
@@ -235,6 +237,7 @@ class ICloud(object):
 
     @property
     def get_sync_photo_album_status(self) -> dict:
+        """Get the sync phto status for the set album."""
         return self.get_album_sync_photo_album_status(
             self.app.configs.icloud_album_name,
             self.app.configs.photo_location
@@ -242,6 +245,7 @@ class ICloud(object):
 
     @property
     def get_sync_photo_all_status(self) -> dict:
+        """Get the sync phto status for all photos."""
         return self.get_album_sync_photo_album_status(
             'All Photos',
             self.app.configs.all_photo_location
@@ -257,7 +261,7 @@ class ICloud(object):
         self.setup_photo_error_handler()
         photo_status = {}
         files_on_disk = paths.get_files_on_disk(photo_location)
-        for i in range(3):
+        for _ in range(3): # pylint: disable=too-many-nested-blocks
             try:
                 if album in self.api.photos.albums:
                     self.app.flask_app.logger.debug(
@@ -285,20 +289,24 @@ class ICloud(object):
                                 # Looks like files changed.... delete and recreate
                                 save_item['status'] = "file-change"
                                 self.app.flask_app.logger.debug(
-                                    album + " sync - Photo '" + photo.filename + "' file-change" + " with id: " + photo.id)
+                                    album + " sync - Photo '" + photo.filename +
+                                    "' file-change" + " with id: " + photo.id)
                             else:
                                 save_item['status'] = "file-downloaded"
                                 self.app.flask_app.logger.debug(
-                                    album + " sync - Photo '" + photo.filename + "' file-exists" + " with id: " + photo.id)
+                                    album + " sync - Photo '" + photo.filename +
+                                    "' file-exists" + " with id: " + photo.id)
                         else:
                             save_item['status'] = "non-existent"
                             self.app.flask_app.logger.debug(
-                                album + " sync - Photo '" + photo.filename + "' file-does-not-exist")
+                                album + " sync - Photo '" + photo.filename +
+                                "' file-does-not-exist")
 
                         if photo.filename in photo_status:
                             photo_status[photo.filename]['status'] = "file-name-duplicated"
                             self.app.flask_app.logger.debug(
-                                album + " sync - Photo '" + photo.filename + "' file-name-duplicated" + " with id: " + photo.id)
+                                album + " sync - Photo '" + photo.filename +
+                                "' file-name-duplicated" + " with id: " + photo.id)
                         else:
                             photo_status[photo.filename] = save_item
                 else:
@@ -314,20 +322,19 @@ class ICloud(object):
                 else:
                     self.app.flask_app.logger.error("iCloud API error: " + err)
 
-        
         file_synced = 0
         file_change_num = 0
         file_does_not_exist_num = 0
         file_name_duplicated_num = 0
         file_unkown_state = 0
-        for name in photo_status:
-            if photo_status[name]['status'] == "file-downloaded":
+        for _, status in photo_status.items():
+            if status['status'] == "file-downloaded":
                 file_synced += 1
-            elif photo_status[name]['status'] == "file-change":
+            elif status['status'] == "file-change":
                 file_change_num += 1
-            elif photo_status[name]['status'] == "non-existent":
+            elif status['status'] == "non-existent":
                 file_does_not_exist_num += 1
-            elif photo_status[name]['status'] == "file-name-duplicated":
+            elif status['status'] == "file-name-duplicated":
                 file_name_duplicated_num += 1
             else:
                 file_unkown_state += 1
@@ -341,7 +348,7 @@ class ICloud(object):
                 SyncName=album, status="file_name_duplicated").set(file_name_duplicated_num)
         self.app.prom_metrics.gauge__icloud__photo_sync_state.labels(
                 SyncName=album, status="unkown").set(file_unkown_state)
-        
+
         return photo_status
 
     def delete_local_photo(self, name, photos=None) -> bool:

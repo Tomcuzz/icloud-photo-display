@@ -271,14 +271,9 @@ class ICloud(): # pylint: disable=too-many-public-methods
                         if photo.item_type not in ("image"):
                             continue
 
-                        download_path = paths.local_download_path(
-                            photo,
-                            photo.versions["original"]["size"],
-                            photo_location)
-
                         save_item = {
                             'photo': photo,
-                            'local_path': download_path
+                            'local_path': paths.local_download_path_with_id(photo, photo_location)
                         }
 
                         if paths.clean_filename(photo.filename) in files_on_disk:

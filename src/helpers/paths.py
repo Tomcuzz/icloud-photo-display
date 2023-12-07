@@ -20,6 +20,12 @@ def local_download_path(media, size, download_dir):
     download_path = os.path.join(download_dir, filename)
     return download_path
 
+def local_download_path_with_id(media, download_dir):
+    """Returns the full download path, including size"""
+    filename = filename_with_size_and_id(media)
+    download_path = os.path.join(download_dir, filename)
+    return download_path
+
 
 def filename_with_size(media, size):
     """Returns the filename with size, e.g. 12345-IMG1234.jpg, 45678-IMG1234.jpg"""

@@ -27,6 +27,15 @@ def filename_with_size(media, size):
     filename = clean_filename(media.filename)
     return str(size) + "-" + filename
 
+
+def filename_with_size_and_id(media, size, photo_id):
+    """Returns the filename with size, e.g. 12345-IMG1234.jpg, 45678-IMG1234.jpg"""
+    # Strip any non-ascii characters.
+    filename = clean_filename(media.filename)
+    clean_id = ''.join(hex(ord(x))[2:] for x in photo_id)
+    return str(size) + "-" + clean_id + "-" + filename
+
+
 def get_files_on_disk(photo_dir):
     to_return = {}
     os.makedirs(name=photo_dir, exist_ok=True)

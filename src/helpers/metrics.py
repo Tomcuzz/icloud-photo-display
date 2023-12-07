@@ -1,6 +1,10 @@
+""" Hanldle prometheus metrics """
+import dataclasses
 from prometheus_client import Counter, Gauge, Enum
 
-class Metrics(object):
+@dataclasses.dataclass
+class Metrics(): # pylint: disable=too-many-instance-attributes
+    """ Enstantiate and hold exported prometheus metrics """
     def __init__(self):
         self.counter__requests__photo_page = Counter('page_photo_requests', 'Number of photo page requests')
         self.counter__error__404 = Counter('page_error_404_counter', 'Number of 404 page returned')

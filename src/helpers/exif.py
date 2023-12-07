@@ -4,7 +4,7 @@ import piexif
 import logging
 
 from piexif._exceptions import InvalidImageDataError
-from src.pyicloud_ipd import utils, base, exceptions
+from pyicloud_ipd import utils, base, exceptions
 
 
 def get_photo_exif(path):

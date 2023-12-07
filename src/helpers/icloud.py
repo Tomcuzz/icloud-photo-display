@@ -257,10 +257,6 @@ class ICloud(object):
             return {}
         self.setup_photo_error_handler()
         photo_status = {}
-        file_synced = 0
-        file_change_num = 0
-        file_does_not_exist_num = 0
-        file_name_duplicated_num = 0
         files_on_disk = paths.get_files_on_disk(photo_location)
         for i in range(3):
             try:
@@ -291,20 +287,16 @@ class ICloud(object):
                                 save_item['status'] = "file-change"
                                 self.app.flask_app.logger.debug(
                                     album + " sync - Photo '" + photo.filename + "' file-change" + " with id: " + photo.id)
-                                file_change_num += 1
                             else:
                                 save_item['status'] = "file-downloaded"
                                 self.app.flask_app.logger.debug(
                                     album + " sync - Photo '" + photo.filename + "' file-exists" + " with id: " + photo.id)
-                                file_synced += 1
                         else:
                             save_item['status'] = "non-existent"
                             self.app.flask_app.logger.debug(
                                 album + " sync - Photo '" + photo.filename + "' file-does-not-exist")
-                            file_does_not_exist_num += 1
 
                         if photo.filename in photo_status:
-                            file_name_duplicated_num += 1
                             photo_status[photo.filename]['status'] = "file-name-duplicated"
                             self.app.flask_app.logger.debug(
                                 album + " sync - Photo '" + photo.filename + "' file-name-duplicated" + " with id: " + photo.id)
@@ -322,6 +314,21 @@ class ICloud(object):
                         self.api.authenticate()
                 else:
                     self.app.flask_app.logger.error("iCloud API error: " + err)
+
+        
+        file_synced = 0
+        file_change_num = 0
+        file_does_not_exist_num = 0
+        file_name_duplicated_num = 0
+        for name in photo_status:
+            if photo_status[name]['status'] == "file-downloaded"
+                file_synced += 1
+            elif photo_status[name]['status'] == "file-change"
+                file_change_num += 1
+            elif photo_status[name]['status'] == "non-existent"
+                file_does_not_exist_num += 1
+            elif photo_status[name]['status'] == "file-name-duplicated"
+                file_name_duplicated_num += 1
         self.app.prom_metrics.gauge__icloud__photo_sync_state.labels(
                 SyncName=album, status="file_synced").set(file_synced)
         self.app.prom_metrics.gauge__icloud__photo_sync_state.labels(

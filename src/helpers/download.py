@@ -7,7 +7,7 @@ import logging
 import datetime
 from tzlocal import get_localzone
 from requests.exceptions import ConnectionError  # pylint: disable=redefined-builtin
-from pyicloud_ipd.exceptions import PyiCloudAPIResponseError
+from src.pyicloud_ipd.exceptions import PyiCloudAPIResponseError
 
 def update_mtime(created: datetime.datetime, download_path):
     """Set the modification time of the downloaded file to the photo creation date"""

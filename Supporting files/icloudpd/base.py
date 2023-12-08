@@ -17,7 +17,7 @@ from tqdm import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 from tzlocal import get_localzone
 
-from pyicloud_ipd.exceptions import PyiCloudAPIResponseError
+from src.pyicloud_ipd.exceptions import PyiCloudAPIResponseError
 
 from icloudpd.authentication import authenticator, TwoStepAuthRequiredError
 from icloudpd import download

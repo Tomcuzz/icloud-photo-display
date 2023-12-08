@@ -28,7 +28,7 @@ from src.pyicloud_ipd.services import (
     PhotosService,
     AccountService
 )
-from src.pyicloud_ipd.utils import get_password_from_keyring
+from pyicloud_ipd.utils import get_password_from_keyring
 
 
 logger = logging.getLogger(__name__)
@@ -99,6 +99,7 @@ class PyiCloudSession(requests.Session):
             code = json.get('serverErrorCode')
 
         if reason:
+            print(json)
             self._raise_error(code, reason)
 
         return response

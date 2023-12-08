@@ -27,6 +27,7 @@ class ICloud(): # pylint: disable=too-many-public-methods
                 self.app.flask_app.logger.debug(
                     'Cookie directory: ' + self.app.configs.cookie_directory)
                 self.api = base.PyiCloudService(
+                    domain='com',
                     apple_id=self.app.configs.username.strip(),
                     password=passwd,
                     cookie_directory=self.app.configs.cookie_directory

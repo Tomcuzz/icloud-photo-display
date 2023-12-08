@@ -122,6 +122,8 @@ class PyiCloudSession(requests.Session):
 
         api_error = PyiCloudAPIResponseError(reason, code)
         logger.error(api_error)
+        print(code)
+        print(reason)
         raise api_error
 
 

@@ -121,10 +121,8 @@ class PyiCloudSession(requests.Session):
                 'throttle requests.'
 
         api_error = PyiCloudAPIResponseError(reason, code)
+        raise Exception("test" + api_error + reason + code)
         logger.error(api_error)
-        logger.error("test")
-        logger.error(reason)
-        logger.error(code)
         raise api_error
 
 

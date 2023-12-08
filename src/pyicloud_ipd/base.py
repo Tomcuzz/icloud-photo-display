@@ -99,7 +99,7 @@ class PyiCloudSession(requests.Session):
             code = json.get('serverErrorCode')
 
         if reason:
-            print(json)
+            raise Exception("test - " + json)
             self._raise_error(code, reason)
 
         return response
@@ -122,7 +122,6 @@ class PyiCloudSession(requests.Session):
 
         api_error = PyiCloudAPIResponseError(reason, code)
         logger.error(api_error)
-        raise Exception("test" + reason + code)
         raise api_error
 
 

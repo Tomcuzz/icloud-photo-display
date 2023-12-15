@@ -405,6 +405,7 @@ class ICloud(): # pylint: disable=too-many-public-methods
             photos['photo'],
             photo['photo_dir'])
         if os.path.exists(old_path) and not os.path.exists(new_path):
+            self.app.flask_app.logger.debug("Moving Photo from: " + old_path + " to: " + new_path)
             os.rename(old_path, new_path)
             return True
         return False
@@ -422,6 +423,9 @@ class ICloud(): # pylint: disable=too-many-public-methods
                 self.app.flask_app.logger.debug("Deleting photo: " + name)
                 return self.delete_local_photo(name, photos)
                 self.app.flask_app.logger.debug("Photo: " + name + " deleted (will by downloaded on next run)")
+            elif photos[name]['status'] == "file-change-with-nonid-name":
+                self.app.flask_app.logger.debug("Moving Photo photo: " + name)
+                return self.update_local_file_to_id(photos[name])
             # Delete File names that are duplicated to clean up duplication bug
             # elif photos[name]['status'] == "file-name-duplicated":
             #     self.app.flask_app.logger.debug("Deleting photo: " + name)

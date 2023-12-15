@@ -36,7 +36,7 @@ class ICloud(): # pylint: disable=too-many-public-methods
                     utils.store_password_in_keyring(self.app.configs.username, passwd)
 
                 return self.api
-            except exceptions.NoStoredPasswordAvailable:
+            except exceptions.PyiCloudNoStoredPasswordAvailableException: #
                 self.app.prom_metrics.counter__icloud__errors.inc()
                 self.app.flask_app.logger.warning('iCloud password not avalible')
             except exceptions.PyiCloudFailedLoginException:

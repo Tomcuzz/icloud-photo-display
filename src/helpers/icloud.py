@@ -274,7 +274,8 @@ class ICloud(): # pylint: disable=too-many-public-methods
 
                         save_item = {
                             'photo': photo,
-                            'local_path': paths.local_download_path_with_id(photo, photo_location)
+                            'local_path': paths.local_download_path_with_id(photo, photo_location),
+                            'photo_dir': photo_location
                         }
 
                         if paths.clean_filename(photo.filename) in files_on_disk:
@@ -383,25 +384,26 @@ class ICloud(): # pylint: disable=too-many-public-methods
         if name in photos:
             download_path = paths.local_download_path(
                 photos[name]['photo'],
-                self.app.configs.photo_location)
+                photo[name]['photo_dir'])
             if os.path.exists(download_path):
                 os.remove(download_path)
                 result = True
             id_path = paths.local_download_path_with_id(
                 photos[name]['photo'],
+                photo[name]['photo_dir']
                 self.app.configs.photo_location)
             if os.path.exists(id_path):
                 os.remove(id_path)
                 result = True
         return result
     
-    def update_local_file_to_id(self, photo) -> bool:
+    def update_local_file_to_id(self, photo:dict) -> bool:
         old_path = paths.local_download_path(
-            photos[name]['photo'],
-            self.app.configs.photo_location)
+            photos['photo'],
+            photo['photo_dir'])
         new_path = paths.local_download_path_with_id(
-            photos[name]['photo'],
-            self.app.configs.photo_location)
+            photos['photo'],
+            photo['photo_dir'])
         if os.path.exists(old_path) and not os.path.exists(new_path):
             os.rename(old_path, new_path)
             return True

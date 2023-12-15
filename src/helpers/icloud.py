@@ -378,16 +378,16 @@ class ICloud(): # pylint: disable=too-many-public-methods
 
     def delete_local_photo(self, name, photos=None) -> bool:
         """ Delete a local photo """
+        result = False
         photos = self.get_sync_photo_album_status
         if name in photos:
             download_path = paths.local_download_path(
                 photos[name]['photo'],
-                photos[name]['photo'].versions["original"]["size"],
                 self.app.configs.photo_location)
             if os.path.exists(download_path):
                 os.remove(download_path)
-                return True
-        return False
+                result = True
+        return result
 
     def sync_photo(self, name, photos=None) -> bool:
         """ Download photo to local path, returns True if no errors. """

@@ -22,8 +22,12 @@
 						<span class="badge rounded-pill text-bg-danger">Not Downloaded</span>
 					{% elif photo_state['status'] == "file-downloaded" %}
 						<span class="badge rounded-pill text-bg-success">Downloaded</span>
-					{% elif photo_state['status'] == "file-change" %}
-						<span class="badge rounded-pill text-bg-warning">File Change</span>
+					{% elif photo_state['status'] == "file-change-with-nonid-name" %}
+						<span class="badge rounded-pill text-bg-warning">File Change With Non-ID Name</span>
+						{% elif photo_state['status'] == "file-downloaded-with-nonid-name" %}
+							<span class="badge rounded-pill text-bg-success">Downloaded With Non-ID Name</span>
+						{% elif photo_state['status'] == "file-change" %}
+							<span class="badge rounded-pill text-bg-warning">File Change</span>
 					{% else %}
 						<span class="badge rounded-pill text-bg-secondary">{{ photo_state['status'] }}</span>
 					{% endif %}
@@ -40,3 +44,5 @@
 	</tbody>
 </table>
 {% endblock %}
+
+

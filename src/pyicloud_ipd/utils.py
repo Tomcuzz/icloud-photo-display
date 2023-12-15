@@ -2,8 +2,8 @@ import getpass
 import sys
 import keyring # pylint: disable=import-error
 
-from .exceptions import NoStoredPasswordAvailable
-
+#from .exceptions import NoStoredPasswordAvailable
+from .exceptions import PyiCloudNoStoredPasswordAvailableException
 
 KEYRING_SYSTEM = 'pyicloud://icloud-password'
 
@@ -11,7 +11,7 @@ KEYRING_SYSTEM = 'pyicloud://icloud-password'
 def get_password(username, interactive=sys.stdout.isatty()):
     try:
         return get_password_from_keyring(username)
-    except NoStoredPasswordAvailable:
+    except PyiCloudNoStoredPasswordAvailableException:
         if not interactive:
             raise
 
@@ -20,24 +20,20 @@ def get_password(username, interactive=sys.stdout.isatty()):
                 username=username,
             )
         )
-
-
 def password_exists_in_keyring(username):
     try:
         get_password_from_keyring(username)
-    except NoStoredPasswordAvailable:
+    except PyiCloudNoStoredPasswordAvailableException:
         return False
 
     return True
-
-
 def get_password_from_keyring(username):
     result = keyring.get_password(
         KEYRING_SYSTEM,
         username
     )
     if result is None:
-        raise NoStoredPasswordAvailable(
+        raise PyiCloudNoStoredPasswordAvailableException(
             "No pyicloud password for {username} could be found "
             "in the system keychain.  Use the `--store-in-keyring` "
             "command-line option for storing a password for this "
@@ -45,28 +41,20 @@ def get_password_from_keyring(username):
                 username=username,
             )
         )
-
     return result
-
-
 def store_password_in_keyring(username, password):
     return keyring.set_password(
         KEYRING_SYSTEM,
         username,
         password,
     )
-
-
 def delete_password_in_keyring(username):
     return keyring.delete_password(
         KEYRING_SYSTEM,
         username,
     )
-
-
 def underscore_to_camelcase(word, initial_capital=False):
     words = [x.capitalize() or '_' for x in word.split('_')]
     if not initial_capital:
         words[0] = words[0].lower()
-
     return ''.join(words)

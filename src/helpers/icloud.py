@@ -387,6 +387,12 @@ class ICloud(): # pylint: disable=too-many-public-methods
             if os.path.exists(download_path):
                 os.remove(download_path)
                 result = True
+            id_path = paths.local_download_path_with_id(
+                photos[name]['photo'],
+                self.app.configs.photo_location)
+            if os.path.exists(id_path):
+                os.remove(id_path)
+                result = True
         return result
 
     def sync_photo(self, name, photos=None) -> bool:

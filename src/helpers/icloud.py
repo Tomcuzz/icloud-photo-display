@@ -78,7 +78,7 @@ class ICloud(): # pylint: disable=too-many-public-methods
         """ Check if 2 Factor Auth Setup needed"""
         if self.api is None:
             return False
-        return self.api.requires_2sa
+        return self.api.requires_2sa or self.api.requires_2fa
 
     @property
     def get_token_exparation(self) -> datetime:
@@ -163,7 +163,7 @@ class ICloud(): # pylint: disable=too-many-public-methods
             return False
         if len(self.api.trusted_devices) == device_id:
             device = {}
-            return self.api.validate_verification_code(device, code)
+            return self.api.validate_2fa_code(code)
         if len(self.api.trusted_devices) > device_id:
             return self.api.validate_verification_code(self.api.trusted_devices[device_id], code)
         self.app.prom_metrics.counter__icloud__errors.inc()

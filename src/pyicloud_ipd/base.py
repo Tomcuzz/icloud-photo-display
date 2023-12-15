@@ -24,7 +24,7 @@ from src.pyicloud_ipd.services import (
     PhotosService,
     AccountService,
 )
-from pyicloud_ipd.utils import get_password_from_keyring
+from src.pyicloud_ipd.utils import get_password_from_keyring
 
 
 LOGGER = logging.getLogger(__name__)

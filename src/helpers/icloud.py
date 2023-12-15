@@ -390,8 +390,7 @@ class ICloud(): # pylint: disable=too-many-public-methods
                 result = True
             id_path = paths.local_download_path_with_id(
                 photos[name]['photo'],
-                photo[name]['photo_dir']
-                self.app.configs.photo_location)
+                photo[name]['photo_dir'])
             if os.path.exists(id_path):
                 os.remove(id_path)
                 result = True

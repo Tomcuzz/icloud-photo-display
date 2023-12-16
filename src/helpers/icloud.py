@@ -398,10 +398,10 @@ class ICloud(): # pylint: disable=too-many-public-methods
     
     def update_local_file_to_id(self, photo:dict) -> bool:
         old_path = paths.local_download_path(
-            photos['photo'],
+            photo['photo'],
             photo['photo_dir'])
         new_path = paths.local_download_path_with_id(
-            photos['photo'],
+            photo['photo'],
             photo['photo_dir'])
         if os.path.exists(old_path) and not os.path.exists(new_path):
             self.app.flask_app.logger.debug("Moving Photo from: " + old_path + " to: " + new_path)

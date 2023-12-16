@@ -16,7 +16,7 @@ def clean_filename(filename):
 
 def local_download_path(media, download_dir):
     """Returns the full download path, including size"""
-    filename = filename_with_size(media, size)
+    filename = filename_with_size(media, media.versions["original"]["size"])
     download_path = os.path.join(download_dir, filename)
     return download_path
 

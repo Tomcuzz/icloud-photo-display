@@ -296,7 +296,7 @@ class ICloud(): # pylint: disable=too-many-public-methods
                                     "' file-exists-with-nonid-name with id: " + photo.id)
                         elif paths.filename_with_id(photo) in files_on_disk:
                              # for later: this crashes if download-size medium is specified
-                            file_size = files_on_disk[paths.clean_filename(photo.filename)]['size']
+                            file_size = files_on_disk[paths.filename_with_id(photo)]['size']
                             version = photo.versions["original"]
                             photo_size = version["size"]
                             if str(file_size) != str(photo_size):

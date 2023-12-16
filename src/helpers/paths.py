@@ -42,6 +42,13 @@ def filename_with_size_and_id(media):
     clean_id = ''.join(hex(ord(x))[2:] for x in media.id)
     return '-'.join([str(size), clean_id, filename])
 
+def filename_with_id(media):
+    """Returns the filename with size, e.g. 12345-IMG1234.jpg, 45678-IMG1234.jpg"""
+    # Strip any non-ascii characters.
+    filename = clean_filename(media.filename)
+    clean_id = ''.join(hex(ord(x))[2:] for x in media.id)
+    return '-'.join([clean_id, filename])
+
 
 def get_files_on_disk(photo_dir):
     """Return the photo files on disk."""

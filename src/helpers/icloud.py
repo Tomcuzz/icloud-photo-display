@@ -436,7 +436,7 @@ class ICloud(): # pylint: disable=too-many-public-methods
             self.app.flask_app.logger.debug("Failed existance check: " + new_path + " existance: " + str(os.path.isfile(new_path)))
         return False
 
-    def sync_photo(self, name, photos=None) -> bool:
+    def sync_photo(self, name, photos=None) -> (bool, bool):
         """ Download photo to local path, returns True if no errors. """
         self.setup_photo_error_handler()
         if photos is None:
@@ -445,21 +445,21 @@ class ICloud(): # pylint: disable=too-many-public-methods
             if photos[name]['status'] == "file-downloaded":
                 # File downloaded, no action needed
                 self.app.flask_app.logger.debug("Sync status done for photo: " + name)
-                return True
+                return True, False
             elif photos[name]['status'] == "non-existent":
                 # File not downloaded, go and download
                 self.app.flask_app.logger.debug("Downloading photo: " + name)
-                return self.download_photo(photos[name]['photo'], photos[name]['local_path'])
+                return self.download_photo(photos[name]['photo'], photos[name]['local_path']), True
             elif photos[name]['status'] == "file-name-duplicated":
                 # Found file with duplicate name, delete so sync can hande download next run
                 self.app.flask_app.logger.debug("Deleting duplicate name photo without id: " + name)
                 result = self.delete_local_photo(name, photos)
                 self.app.flask_app.logger.debug("Photo: " + name + " deleted (will by downloaded on next run)")
-                return result
+                return result, False
             elif photos[name]['status'] == "file-downloaded-with-nonid-name":
                 # Found file with old naming style, move to new file name stlye
                 self.app.flask_app.logger.debug("Moving Photo photo: " + name)
-                return self.update_local_file_to_id(photos[name])
+                return self.update_local_file_to_id(photos[name]), False
             else:
                 self.app.flask_app.logger.debug("Status action not implemnented for: " + photos[name]['status'])
             # Delete File names that are duplicated to clean up duplication bug
@@ -472,7 +472,7 @@ class ICloud(): # pylint: disable=too-many-public-methods
             #     return self.delete_local_photo(name, photos)
             #     self.app.flask_app.logger.debug("Downloading photo: " + name)
             #     return self.download_photo(photos[name]['photo'], photos[name]['local_path'])
-        return True
+        return True, False
 
 
     def sync_album(self, sync_all_photos=False):
@@ -493,7 +493,8 @@ class ICloud(): # pylint: disable=too-many-public-methods
             download_failures = 0
             for photo in photos:
                 self.app.flask_app.logger.debug("Syncing photo: " + photo)
-                if not self.sync_photo(photo, photos):
+                photo_sync_results = self.sync_photo(photo, photos)
+                if not photo_sync_results[0] and photo_sync_results[1]:
                     download_failures += 1
                 if download_failures > self.app.configs.max_download_attempts:
                     self.app.prom_metrics.gauge__icloud__sync_errors.labels(

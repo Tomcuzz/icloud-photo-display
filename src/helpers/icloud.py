@@ -268,7 +268,12 @@ class ICloud(): # pylint: disable=too-many-public-methods
                 if album in self.api.photos.albums:
                     self.app.flask_app.logger.debug(
                         album + " sync - Album '" + album + "' found")
+                    num_files = len(self.api.photos.albums[album])
+                    photo_loop_id = 0
+                    self.app.flask_app.logger.debug(
+                        album + " sync - " + str(num_files) + " photos found in icloud")
                     for photo in self.api.photos.albums[album]:
+                        photo_loop_id += 1
                         if photo.item_type not in ("image"):
                             continue
 
@@ -295,7 +300,8 @@ class ICloud(): # pylint: disable=too-many-public-methods
                             else:
                                 save_item['status'] = "file-downloaded-with-nonid-name"
                                 self.app.flask_app.logger.debug(
-                                    album + " sync - Photo '" + photo.filename +
+                                    album + " sync - (" + str(photo_loop_id) + "/" +
+                                    str(num_files) + ") Photo '" + photo.filename +
                                     "' file-exists-with-nonid-name with id: " + photo.id)
                         elif paths.filename_with_id(photo) in files_on_disk:
                              # for later: this crashes if download-size medium is specified
@@ -306,23 +312,27 @@ class ICloud(): # pylint: disable=too-many-public-methods
                                 # Looks like files changed.... delete and recreate
                                 save_item['status'] = "file-change"
                                 self.app.flask_app.logger.debug(
-                                    album + " sync - Photo '" + photo.filename +
+                                    album + " sync - (" + str(photo_loop_id) + "/" +
+                                    str(num_files) + ") Photo '" + photo.filename +
                                     "' file-change with id: " + photo.id)
                             else:
                                 save_item['status'] = "file-downloaded"
                                 self.app.flask_app.logger.debug(
-                                    album + " sync - Photo '" + photo.filename +
+                                    album + " sync - (" + str(photo_loop_id) + "/" +
+                                    str(num_files) + ") Photo '" + photo.filename +
                                     "' file-exists with id: " + photo.id)
                         else:
                             save_item['status'] = "non-existent"
                             self.app.flask_app.logger.debug(
-                                album + " sync - Photo '" + photo.filename +
+                                album + " sync - (" + str(photo_loop_id) + "/" +
+                                    str(num_files) + ") Photo '" + photo.filename +
                                 "' file-does-not-exist")
 
                         if key in photo_status:
                             photo_status[key]['status'] = "file-name-duplicated"
                             self.app.flask_app.logger.debug(
-                                album + " sync - Photo '" + photo.filename +
+                                album + " sync - (" + str(photo_loop_id) + "/" +
+                                    str(num_files) + ") Photo '" + photo.filename +
                                 "' file-name-duplicated" + " with id: " + photo.id)
                         else:
                             photo_status[key] = save_item

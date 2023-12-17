@@ -389,13 +389,13 @@ class ICloud(): # pylint: disable=too-many-public-methods
                 photos[name]['photo'],
                 photo[name]['photo_dir'])
             try:
-                if os.path.exists(download_path):
+                if os.path.isfile(download_path):
                     os.remove(download_path)
                     result = True
                 id_path = paths.local_download_path_with_id(
                     photos[name]['photo'],
                     photo[name]['photo_dir'])
-                if os.path.exists(id_path):
+                if os.path.isfile(id_path):
                     os.remove(id_path)
                     result = True
             except OSError:

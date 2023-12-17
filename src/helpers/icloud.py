@@ -437,7 +437,7 @@ class ICloud(): # pylint: disable=too-many-public-methods
         return False
 
     def sync_photo(self, name, photos=None) -> (bool, bool):
-        """ Download photo to local path, returns True if no errors. """
+        """ Download photo to local path, returns True if no errors for first bool. and True if connection made to icloud on second bool"""
         self.setup_photo_error_handler()
         if photos is None:
             photos = self.get_sync_photo_album_status

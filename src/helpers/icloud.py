@@ -429,6 +429,8 @@ class ICloud(): # pylint: disable=too-many-public-methods
             elif photos[name]['status'] == "file-downloaded-with-nonid-name":
                 self.app.flask_app.logger.debug("Moving Photo photo: " + name)
                 return self.update_local_file_to_id(photos[name])
+            else:
+                self.app.flask_app.logger.debug("Status action not implemnented for: " + photos[name]['status'])
             # Delete File names that are duplicated to clean up duplication bug
             # elif photos[name]['status'] == "file-name-duplicated":
             #     self.app.flask_app.logger.debug("Deleting photo: " + name)

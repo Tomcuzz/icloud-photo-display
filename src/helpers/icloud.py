@@ -390,12 +390,14 @@ class ICloud(): # pylint: disable=too-many-public-methods
                 photo[name]['photo_dir'])
             try:
                 if os.path.isfile(download_path):
+                    self.app.flask_app.logger.debug("Deleting photo path: " + download_path)
                     os.remove(download_path)
                     result = True
                 id_path = paths.local_download_path_with_id(
                     photos[name]['photo'],
                     photo[name]['photo_dir'])
                 if os.path.isfile(id_path):
+                    self.app.flask_app.logger.debug("Deleting photo path: " + id_path)
                     os.remove(id_path)
                     result = True
             except OSError:

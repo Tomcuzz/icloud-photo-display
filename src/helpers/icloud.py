@@ -433,14 +433,17 @@ class ICloud(): # pylint: disable=too-many-public-methods
             photos = self.get_sync_photo_album_status
         if name in photos:
             if photos[name]['status'] == "non-existent":
+                # File not downloaded, go and download
                 self.app.flask_app.logger.debug("Downloading photo: " + name)
                 return self.download_photo(photos[name]['photo'], photos[name]['local_path'])
             elif photos[name]['status'] == "file-name-duplicated":
+                # Found file with duplicate name, delete so sync can hande download next run
                 self.app.flask_app.logger.debug("Deleting duplicate name photo without id: " + name)
                 result = self.delete_local_photo(name, photos)
                 self.app.flask_app.logger.debug("Photo: " + name + " deleted (will by downloaded on next run)")
                 return result
             elif photos[name]['status'] == "file-downloaded-with-nonid-name":
+                # Found file with old naming style, move to new file name stlye
                 self.app.flask_app.logger.debug("Moving Photo photo: " + name)
                 return self.update_local_file_to_id(photos[name])
             else:

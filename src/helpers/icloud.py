@@ -278,11 +278,14 @@ class ICloud(): # pylint: disable=too-many-public-methods
                             'photo_dir': photo_location
                         }
 
+                        key = paths.filename_with_id(photo)
+
                         if paths.clean_filename(photo.filename) in files_on_disk:
                             # for later: this crashes if download-size medium is specified
                             file_size = files_on_disk[paths.clean_filename(photo.filename)]['size']
                             version = photo.versions["original"]
                             photo_size = version["size"]
+                            key = photo.filename
                             if str(file_size) != str(photo_size):
                                 # Looks like files changed.... delete and recreate
                                 save_item['status'] = "file-change-with-nonid-name"
@@ -316,13 +319,13 @@ class ICloud(): # pylint: disable=too-many-public-methods
                                 album + " sync - Photo '" + photo.filename +
                                 "' file-does-not-exist")
 
-                        if photo.filename in photo_status:
-                            photo_status[photo.filename]['status'] = "file-name-duplicated"
+                        if key in photo_status:
+                            photo_status[key]['status'] = "file-name-duplicated"
                             self.app.flask_app.logger.debug(
                                 album + " sync - Photo '" + photo.filename +
                                 "' file-name-duplicated" + " with id: " + photo.id)
                         else:
-                            photo_status[photo.filename] = save_item
+                            photo_status[key] = save_item
                 else:
                     self.app.flask_app.logger("Photo Album '" + album + "' not found")
                 # Break as we now got to end of sync and dont need to retry
@@ -422,7 +425,7 @@ class ICloud(): # pylint: disable=too-many-public-methods
                 self.app.flask_app.logger.debug("Downloading photo: " + name)
                 return self.download_photo(photos[name]['photo'], photos[name]['local_path'])
             elif photos[name]['status'] == "file-name-duplicated":
-                self.app.flask_app.logger.debug("Deleting photo: " + name)
+                self.app.flask_app.logger.debug("Deleting duplicate name photo without id: " + name)
                 result = self.delete_local_photo(name, photos)
                 self.app.flask_app.logger.debug("Photo: " + name + " deleted (will by downloaded on next run)")
                 return result

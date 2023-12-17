@@ -442,7 +442,11 @@ class ICloud(): # pylint: disable=too-many-public-methods
         if photos is None:
             photos = self.get_sync_photo_album_status
         if name in photos:
-            if photos[name]['status'] == "non-existent":
+            if photos[name]['status'] == "file-downloaded":
+                # File downloaded, no action needed
+                self.app.flask_app.logger.debug("Sync status done for photo: " + name)
+                return True
+            elif photos[name]['status'] == "non-existent":
                 # File not downloaded, go and download
                 self.app.flask_app.logger.debug("Downloading photo: " + name)
                 return self.download_photo(photos[name]['photo'], photos[name]['local_path'])

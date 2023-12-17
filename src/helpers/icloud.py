@@ -388,15 +388,19 @@ class ICloud(): # pylint: disable=too-many-public-methods
             download_path = paths.local_download_path(
                 photos[name]['photo'],
                 photo[name]['photo_dir'])
-            if os.path.exists(download_path):
-                os.remove(download_path)
-                result = True
-            id_path = paths.local_download_path_with_id(
-                photos[name]['photo'],
-                photo[name]['photo_dir'])
-            if os.path.exists(id_path):
-                os.remove(id_path)
-                result = True
+            try:
+                if os.path.exists(download_path):
+                    os.remove(download_path)
+                    result = True
+                id_path = paths.local_download_path_with_id(
+                    photos[name]['photo'],
+                    photo[name]['photo_dir'])
+                if os.path.exists(id_path):
+                    os.remove(id_path)
+                    result = True
+            except OSError:
+                self.app.flask_app.logger.debug("delete_local_photo: OSError exception raised")
+                return False
         return result
     
     def update_local_file_to_id(self, photo:dict) -> bool:
@@ -408,7 +412,11 @@ class ICloud(): # pylint: disable=too-many-public-methods
             photo['photo_dir'])
         if os.path.isfile(old_path) and not os.path.isfile(new_path):
             self.app.flask_app.logger.debug("Moving Photo from: " + old_path + " to: " + new_path)
-            os.rename(old_path, new_path)
+            try:
+                os.rename(old_path, new_path)
+            except OSError:
+                self.app.flask_app.logger.debug("update_local_file_to_id: OSError exception raised")
+                return False
             return True
         else: 
             self.app.flask_app.logger.debug("Failed existance check: " + old_path + " existance: " + str(os.path.isfile(old_path)))

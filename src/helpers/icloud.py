@@ -432,11 +432,11 @@ class ICloud(): # pylint: disable=too-many-public-methods
             if photos[name]['status'] == "non-existent":
                 self.app.flask_app.logger.debug("Downloading photo: " + name)
                 return self.download_photo(photos[name]['photo'], photos[name]['local_path'])
-            # elif photos[name]['status'] == "file-name-duplicated":
-            #     self.app.flask_app.logger.debug("Deleting duplicate name photo without id: " + name)
-            #     result = self.delete_local_photo(name, photos)
-            #     self.app.flask_app.logger.debug("Photo: " + name + " deleted (will by downloaded on next run)")
-            #     return result
+            elif photos[name]['status'] == "file-name-duplicated":
+                self.app.flask_app.logger.debug("Deleting duplicate name photo without id: " + name)
+                result = self.delete_local_photo(name, photos)
+                self.app.flask_app.logger.debug("Photo: " + name + " deleted (will by downloaded on next run)")
+                return result
             elif photos[name]['status'] == "file-downloaded-with-nonid-name":
                 self.app.flask_app.logger.debug("Moving Photo photo: " + name)
                 return self.update_local_file_to_id(photos[name])

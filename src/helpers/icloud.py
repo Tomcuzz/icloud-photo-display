@@ -403,10 +403,13 @@ class ICloud(): # pylint: disable=too-many-public-methods
         new_path = paths.local_download_path_with_id(
             photo['photo'],
             photo['photo_dir'])
-        if os.path.exists(old_path) and not os.path.exists(new_path):
+        if os.path.isfile(old_path) and not os.path.isfile(new_path):
             self.app.flask_app.logger.debug("Moving Photo from: " + old_path + " to: " + new_path)
             os.rename(old_path, new_path)
             return True
+        else: 
+            self.app.flask_app.logger.debug("Failed existance check: " + old_path + " existance: " + str(os.path.isfile(old_path)))
+            self.app.flask_app.logger.debug("Failed existance check: " + new_path + " existance: " + str(os.path.isfile(new_path)))
         return False
 
     def sync_photo(self, name, photos=None) -> bool:

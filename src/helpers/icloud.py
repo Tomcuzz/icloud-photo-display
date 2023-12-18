@@ -461,14 +461,16 @@ class ICloud(): # pylint: disable=too-many-public-methods
                 # Found file with old naming style, move to new file name stlye
                 self.app.flask_app.logger.debug("Moving Photo photo: " + name)
                 return self.update_local_file_to_id(photos[name]), False
-            else:
-                self.app.flask_app.logger.debug("Status action not implemnented for: " + photos[name]['status'])
             # Disabling till multiple photos with same name issue fixed
             # elif photos[name]['status'] == "file-change":
             #     self.app.flask_app.logger.debug("Deleting photo: " + name)
-            #     return self.delete_local_photo(name, photos)
-            #     self.app.flask_app.logger.debug("Downloading photo: " + name)
-            #     return self.download_photo(photos[name]['photo'], photos[name]['local_path'])
+            #     if self.delete_local_photo(name, photos):
+            #         self.app.flask_app.logger.debug("Downloading photo: " + name)
+            #         return self.download_photo(photos[name]['photo'], photos[name]['local_path']), True
+            #     else:
+            #         return False, False
+            else:
+                self.app.flask_app.logger.debug("Status action not implemnented for: " + photos[name]['status'])
         return True, False
 
 

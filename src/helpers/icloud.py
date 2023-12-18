@@ -463,10 +463,6 @@ class ICloud(): # pylint: disable=too-many-public-methods
                 return self.update_local_file_to_id(photos[name]), False
             else:
                 self.app.flask_app.logger.debug("Status action not implemnented for: " + photos[name]['status'])
-            # Delete File names that are duplicated to clean up duplication bug
-            # elif photos[name]['status'] == "file-name-duplicated":
-            #     self.app.flask_app.logger.debug("Deleting photo: " + name)
-            #     return self.delete_local_photo(name, photos)
             # Disabling till multiple photos with same name issue fixed
             # elif photos[name]['status'] == "file-change":
             #     self.app.flask_app.logger.debug("Deleting photo: " + name)

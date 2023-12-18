@@ -387,23 +387,21 @@ class ICloud(): # pylint: disable=too-many-public-methods
 
         return photo_status
 
-    def delete_local_photo(self, name, photos=None) -> bool:
+    def delete_local_photo(self, photo:dict) -> bool:
         """ Delete a local photo """
         result = False
-        if not photos:
-            photos = self.get_sync_photo_album_status
         if name in photos:
             download_path = paths.local_download_path(
-                photos[name]['photo'],
-                photos[name]['photo_dir'])
+                photo['photo'],
+                photo['photo_dir'])
             try:
                 if os.path.isfile(download_path):
                     self.app.flask_app.logger.debug("Deleting photo path: " + download_path)
                     os.remove(download_path)
                     result = True
                 id_path = paths.local_download_path_with_id(
-                    photos[name]['photo'],
-                    photos[name]['photo_dir'])
+                    photo['photo'],
+                    photo['photo_dir'])
                 if os.path.isfile(id_path):
                     self.app.flask_app.logger.debug("Deleting photo path: " + id_path)
                     os.remove(id_path)
@@ -450,7 +448,7 @@ class ICloud(): # pylint: disable=too-many-public-methods
             elif photos[name]['status'] == "file-name-duplicated":
                 # Found file with duplicate name, delete so sync can hande download next run
                 self.app.flask_app.logger.debug("Deleting duplicate name photo without id: " + name)
-                if self.delete_local_photo(name, photos):
+                if self.delete_local_photo(photos[name]):
                     self.app.flask_app.logger.debug("Downloading photo: " + name)
                     return self.download_photo(photos[name]['photo'], photos[name]['photo_dir']), True
                 else:
@@ -463,7 +461,7 @@ class ICloud(): # pylint: disable=too-many-public-methods
             # Disabling till multiple photos with same name issue fixed
             # elif photos[name]['status'] == "file-change":
             #     self.app.flask_app.logger.debug("Deleting photo: " + name)
-            #     if self.delete_local_photo(name, photos):
+            #     if self.delete_local_photo(photos[name]):
             #         self.app.flask_app.logger.debug("Downloading photo: " + name)
             #         return self.download_photo(photos[name]['photo'], photos[name]['photo_dir']), True
             #     else:

@@ -38,5 +38,7 @@ def add_sync_status_pages(app, app_helper:AppHelper):
     @app.route("/delete_local/<string:photname>")
     def delete_photo_page(photname):
         """ Sync Photo Page """
-        app_helper.icloud_helper.delete_local_photo(photname)
+        photos = self.get_sync_photo_album_status
+        if photname in photos:
+            app_helper.icloud_helper.delete_local_photo(photos[photname])
         return redirect(url_for('sync_status_page'))

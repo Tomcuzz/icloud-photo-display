@@ -338,7 +338,7 @@ class ICloud(): # pylint: disable=too-many-public-methods
                         else:
                             photo_status[key] = save_item
                 else:
-                    self.app.flask_app.logger("Photo Album '" + album + "' not found")
+                    self.app.flask_app.logger.error("Photo Album '" + album + "' not found")
                 # Break as we now got to end of sync and dont need to retry
                 break
             except exceptions.PyiCloudAPIResponseError as err:

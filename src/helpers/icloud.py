@@ -391,10 +391,10 @@ class ICloud(): # pylint: disable=too-many-public-methods
         """ Delete a local photo """
         result = False
         if name in photos:
-            download_path = paths.local_download_path(
-                photo['photo'],
-                photo['photo_dir'])
             try:
+                download_path = paths.local_download_path(
+                    photo['photo'],
+                    photo['photo_dir'])
                 if os.path.isfile(download_path):
                     self.app.flask_app.logger.debug("Deleting photo path: " + download_path)
                     os.remove(download_path)

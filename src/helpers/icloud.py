@@ -295,7 +295,8 @@ class ICloud(): # pylint: disable=too-many-public-methods
                                 # Looks like files changed.... delete and recreate
                                 save_item['status'] = "file-change-with-nonid-name"
                                 self.app.flask_app.logger.debug(
-                                    album + " sync - Photo '" + photo.filename +
+                                    album + " sync - (" + str(photo_loop_id) + "/" +
+                                    str(num_files) + ") Photo '" + photo.filename +
                                     "' file-change-with-nonid-name with id: " + photo.id)
                             else:
                                 save_item['status'] = "file-downloaded-with-nonid-name"

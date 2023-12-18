@@ -187,7 +187,7 @@ class ICloud(): # pylint: disable=too-many-public-methods
         self.app.prom_metrics.counter__icloud__errors.inc()
         return False
 
-    def download_photo(self, photo, download_path) -> bool:
+    def download_photo(self, photo, download_folder_path) -> bool:
         """ Given a path download a photo from iCloud, returns True if download is successful. """
         self.setup_photo_error_handler()
         try:
@@ -198,6 +198,7 @@ class ICloud(): # pylint: disable=too-many-public-methods
                 "Could not convert photo created date to local timezone (%s)",
                 photo.created)
             created_date = photo.created
+        download_path = paths.local_download_path_with_id(photo, photo_location)
         download_result = download.download_media(
             self, photo, download_path, "original"
         )
@@ -279,7 +280,6 @@ class ICloud(): # pylint: disable=too-many-public-methods
 
                         save_item = {
                             'photo': photo,
-                            'local_path': paths.local_download_path_with_id(photo, photo_location),
                             'photo_dir': photo_location
                         }
 
@@ -446,13 +446,13 @@ class ICloud(): # pylint: disable=too-many-public-methods
             elif photos[name]['status'] == "non-existent":
                 # File not downloaded, go and download
                 self.app.flask_app.logger.debug("Downloading photo: " + name)
-                return self.download_photo(photos[name]['photo'], photos[name]['local_path']), True
+                return self.download_photo(photos[name]['photo'], photos[name]['photo_dir']), True
             elif photos[name]['status'] == "file-name-duplicated":
                 # Found file with duplicate name, delete so sync can hande download next run
                 self.app.flask_app.logger.debug("Deleting duplicate name photo without id: " + name)
                 if self.delete_local_photo(name, photos):
                     self.app.flask_app.logger.debug("Downloading photo: " + name)
-                    return self.download_photo(photos[name]['photo'], photos[name]['local_path']), True
+                    return self.download_photo(photos[name]['photo'], photos[name]['photo_dir']), True
                 else:
                     return False, False
                 return result, False
@@ -465,7 +465,7 @@ class ICloud(): # pylint: disable=too-many-public-methods
             #     self.app.flask_app.logger.debug("Deleting photo: " + name)
             #     if self.delete_local_photo(name, photos):
             #         self.app.flask_app.logger.debug("Downloading photo: " + name)
-            #         return self.download_photo(photos[name]['photo'], photos[name]['local_path']), True
+            #         return self.download_photo(photos[name]['photo'], photos[name]['photo_dir']), True
             #     else:
             #         return False, False
             else:

@@ -287,11 +287,9 @@ class ICloud(): # pylint: disable=too-many-public-methods
 
                         if paths.clean_filename(photo.filename) in files_on_disk:
                             # for later: this crashes if download-size medium is specified
-                            file_size = files_on_disk[paths.clean_filename(photo.filename)]['size']
-                            version = photo.versions["original"]
-                            photo_size = version["size"]
                             key = photo.filename
-                            if str(file_size) != str(photo_size):
+                            if (str(files_on_disk[paths.clean_filename(photo.filename)]['size']) !=
+                                str(photo.versions["original"]["size"])):
                                 # Looks like files changed.... delete and recreate
                                 save_item['status'] = "file-change-with-nonid-name"
                                 self.app.flask_app.logger.debug(
@@ -306,10 +304,8 @@ class ICloud(): # pylint: disable=too-many-public-methods
                                     "' file-exists-with-nonid-name with id: " + photo.id)
                         elif paths.filename_with_id(photo) in files_on_disk:
                              # for later: this crashes if download-size medium is specified
-                            file_size = files_on_disk[paths.filename_with_id(photo)]['size']
-                            version = photo.versions["original"]
-                            photo_size = version["size"]
-                            if str(file_size) != str(photo_size):
+                            if (str(files_on_disk[paths.filename_with_id(photo)]['size']) != 
+                                str(photo.versions["original"]["size"])):
                                 # Looks like files changed.... delete and recreate
                                 save_item['status'] = "file-change"
                                 self.app.flask_app.logger.debug(

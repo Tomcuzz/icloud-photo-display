@@ -255,13 +255,17 @@ class ICloud(): # pylint: disable=too-many-public-methods
             self.app.configs.all_photo_location
         )
     
-    def write_album_sync_cache(self, album:str, state:dict):
+    def read_album_sync_cache(self) -> dict:
         data = {}
         try:
             file = open(self.app.settings.photo_state_cache_path, encoding="utf-8")
             data = json.load(file)
         except Exception as error: # pylint: disable=broad-exception-caught
             print('Failed to load photo state cache:', error)
+        return data
+    
+    def write_album_sync_cache(self, album:str, state:dict):
+        data = self.read_album_sync_cache()
         data[album] = {
             'last_update':  int(time.time()),
             'photo_states': state

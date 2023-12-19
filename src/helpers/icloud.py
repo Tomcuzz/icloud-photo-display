@@ -242,6 +242,11 @@ class ICloud(): # pylint: disable=too-many-public-methods
     @property
     def get_sync_photo_album_status(self) -> dict:
         """Get the sync phto status for the set album."""
+        cache = self.read_album_sync_cache()
+        if self.app.configs.icloud_album_name in cache:
+            last_update = cache[self.app.configs.icloud_album_name][last_update]
+            if (int(time.time()) - last_update) < self.app.settings.photo_state_cache_lifetime:
+                return cache[self.app.configs.icloud_album_name]['photo_states']
         return self.get_album_sync_photo_album_status(
             self.app.configs.icloud_album_name,
             self.app.configs.photo_location
@@ -250,6 +255,11 @@ class ICloud(): # pylint: disable=too-many-public-methods
     @property
     def get_sync_photo_all_status(self) -> dict:
         """Get the sync phto status for all photos."""
+        cache = self.read_album_sync_cache()
+        if 'All Photos' in cache:
+            last_update = cache['All Photos'][last_update]
+            if (int(time.time()) - last_update) < self.app.settings.photo_state_cache_lifetime:
+                return cache['All Photos']['photo_states']
         return self.get_album_sync_photo_album_status(
             'All Photos',
             self.app.configs.all_photo_location

@@ -198,7 +198,7 @@ class ICloud(): # pylint: disable=too-many-public-methods
                 "Could not convert photo created date to local timezone (%s)",
                 photo.created)
             created_date = photo.created
-        download_path = paths.local_download_path_with_id(photo, photo_location)
+        download_path = paths.local_download_path_with_id(photo, download_folder_path)
         download_result = download.download_media(
             self, photo, download_path, "original"
         )

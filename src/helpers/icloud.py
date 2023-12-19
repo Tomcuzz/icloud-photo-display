@@ -458,7 +458,7 @@ class ICloud(): # pylint: disable=too-many-public-methods
             elif photos[name]['status'] == "file-name-duplicated":
                 # Found file with duplicate name, delete so sync can hande download next run
                 self.app.flask_app.logger.debug("Deleting duplicate name photo without id: " + name)
-                if self.delete_local_photo(photos[name]):
+                if self.delete_local_file(name, photos[name]['photo_dir']):
                     self.app.flask_app.logger.debug("Downloading photo: " + name)
                     return self.download_photo(photos[name]['photo'], photos[name]['photo_dir']), True
                 else:

@@ -280,6 +280,7 @@ class ICloud(): # pylint: disable=too-many-public-methods
 
                         save_item = {
                             'photo': photo,
+                            'old_file_paths': [],
                             'photo_dir': photo_location
                         }
 
@@ -292,12 +293,14 @@ class ICloud(): # pylint: disable=too-many-public-methods
                                 str(photo.versions["original"]["size"])):
                                 # Looks like files changed.... delete and recreate
                                 save_item['status'] = "file-change-with-nonid-name"
+                                save_item['old_file_paths'] = [files_on_disk[paths.clean_filename(photo.filename)]['file_path']]
                                 self.app.flask_app.logger.debug(
                                     album + " sync - (" + str(photo_loop_id) + "/" +
                                     str(num_files) + ") Photo '" + photo.filename +
                                     "' file-change-with-nonid-name with id: " + photo.id)
                             else:
                                 save_item['status'] = "file-downloaded-with-nonid-name"
+                                save_item['old_file_paths'] = [files_on_disk[paths.clean_filename(photo.filename)]['file_path']]
                                 self.app.flask_app.logger.debug(
                                     album + " sync - (" + str(photo_loop_id) + "/" +
                                     str(num_files) + ") Photo '" + photo.filename +
@@ -308,12 +311,14 @@ class ICloud(): # pylint: disable=too-many-public-methods
                                 str(photo.versions["original"]["size"])):
                                 # Looks like files changed.... delete and recreate
                                 save_item['status'] = "file-change"
+                                save_item['old_file_paths'] = [files_on_disk[paths.filename_with_id(photo)]['file_path']]
                                 self.app.flask_app.logger.debug(
                                     album + " sync - (" + str(photo_loop_id) + "/" +
                                     str(num_files) + ") Photo '" + photo.filename +
                                     "' file-change with id: " + photo.id)
                             else:
                                 save_item['status'] = "file-downloaded"
+                                save_item['old_file_paths'] = [files_on_disk[paths.filename_with_id(photo)]['file_path']]
                                 self.app.flask_app.logger.debug(
                                     album + " sync - (" + str(photo_loop_id) + "/" +
                                     str(num_files) + ") Photo '" + photo.filename +
@@ -327,6 +332,7 @@ class ICloud(): # pylint: disable=too-many-public-methods
 
                         if key in photo_status:
                             photo_status[key]['status'] = "file-name-duplicated"
+                            photo_status[key]['old_file_paths'].extend(save_item['old_file_paths'])
                             self.app.flask_app.logger.debug(
                                 album + " sync - (" + str(photo_loop_id) + "/" +
                                     str(num_files) + ") Photo '" + photo.filename +
@@ -431,9 +437,8 @@ class ICloud(): # pylint: disable=too-many-public-methods
             self.app.flask_app.logger.debug("Failed existance check: " + new_path + " existance: " + str(os.path.isfile(new_path)))
         return False
     
-    def delete_local_file(self, filename, path) -> bool:
+    def delete_local_file(self, file_path) -> bool:
         try:
-            file_path = path + "/" + filename
             if os.path.isfile(file_path):
                 self.app.flask_app.logger.debug("Deleting file path:" + file_path)
                 os.remove(file_path)
@@ -460,11 +465,13 @@ class ICloud(): # pylint: disable=too-many-public-methods
             elif photos[name]['status'] == "file-name-duplicated":
                 # Found file with duplicate name, delete so sync can hande download next run
                 self.app.flask_app.logger.debug("Deleting duplicate name photo without id: " + name)
-                if self.delete_local_file(name, photos[name]['photo_dir']):
-                    self.app.flask_app.logger.debug("Downloading photo: " + name)
+                should_download = False
+                for old_path in photos[name]['old_file_paths']:
+                    self.app.flask_app.logger.debug("Downloading photo: " + old_path)
+                    self.delete_local_file(old_path)
+                    should_download = True
+                if should_download:
                     return self.download_photo(photos[name]['photo'], photos[name]['photo_dir']), True
-                else:
-                    return False, False
                 return result, False
             elif photos[name]['status'] == "file-downloaded-with-nonid-name":
                 # Found file with old naming style, move to new file name stlye

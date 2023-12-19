@@ -472,7 +472,7 @@ class ICloud(): # pylint: disable=too-many-public-methods
                     should_download = True
                 if should_download:
                     return self.download_photo(photos[name]['photo'], photos[name]['photo_dir']), True
-                return result, False
+                return False, False
             elif photos[name]['status'] == "file-downloaded-with-nonid-name":
                 # Found file with old naming style, move to new file name stlye
                 self.app.flask_app.logger.debug("Moving Photo photo: " + name)

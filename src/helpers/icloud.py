@@ -430,6 +430,16 @@ class ICloud(): # pylint: disable=too-many-public-methods
             self.app.flask_app.logger.debug("Failed existance check: " + old_path + " existance: " + str(os.path.isfile(old_path)))
             self.app.flask_app.logger.debug("Failed existance check: " + new_path + " existance: " + str(os.path.isfile(new_path)))
         return False
+    
+    def delete_local_file(self, filename, path) -> bool:
+        try:
+            file_path = path + "/" + filename
+            if os.path.isfile(file_path):
+                self.app.flask_app.logger.debug("Deleting file path:" + file_path)
+                os.remove(file_path)
+        except OSError:
+            self.app.flask_app.logger.debug("delete_local_file: OSError exception raised")
+            return False
 
     def sync_photo(self, name, photos=None) -> (bool, bool):
         """ Download photo to local path, returns True if no errors for first bool. and True if connection made to icloud on second bool"""

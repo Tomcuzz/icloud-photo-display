@@ -507,9 +507,12 @@ class ICloud(): # pylint: disable=too-many-public-methods
             self.app.flask_app.logger.debug(album_name + " Sync - Photo Status Recieved")
             download_failures = 0
             for photo in photos:
-                self.app.flask_app.logger.debug("Syncing photo: " + photo)
-                photo_sync_results = self.sync_photo(photo, photos)
-                if not photo_sync_results[0] and photo_sync_results[1]:
+                try:
+                    self.app.flask_app.logger.debug("Syncing photo: " + photo)
+                    photo_sync_results = self.sync_photo(photo, photos)
+                    if not photo_sync_results[0] and photo_sync_results[1]:
+                        download_failures += 1
+                except:
                     download_failures += 1
                 if download_failures > self.app.configs.max_download_attempts:
                     self.app.prom_metrics.gauge__icloud__sync_errors.labels(

@@ -437,6 +437,8 @@ class ICloud(): # pylint: disable=too-many-public-methods
             if os.path.isfile(file_path):
                 self.app.flask_app.logger.debug("Deleting file path:" + file_path)
                 os.remove(file_path)
+            else:
+                self.app.flask_app.logger.debug("File not present at path:" + file_path)
         except OSError:
             self.app.flask_app.logger.debug("delete_local_file: OSError exception raised")
             return False

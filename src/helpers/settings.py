@@ -8,6 +8,7 @@ class Settings(): # pylint: disable=too-many-instance-attributes
         self.cookie_directory = working_dir + "/cookie"
         self.photo_location = working_dir + "/photos"
         self.all_photo_location = working_dir + "/all-photos"
+        self.photo_state_cache_path = working_dir + "/photo_state_cache.json"
         self.icloud_album_name = ""
         self.watch_interval = 3600
         self.all_watch_interval = 0

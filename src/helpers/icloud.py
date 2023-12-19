@@ -1,6 +1,7 @@
 """ iCloud api connection helpers """
 import os
 import shutil
+import time
 from datetime import datetime
 from tzlocal import get_localzone # pylint: disable=import-error
 from src.pyicloud_ipd import utils, base, exceptions # pylint: disable=import-error
@@ -253,6 +254,24 @@ class ICloud(): # pylint: disable=too-many-public-methods
             'All Photos',
             self.app.configs.all_photo_location
         )
+    
+    def write_album_sync_cache(self, album:str, state:dict):
+        data = {}
+        try:
+            file = open(self.app.settings.photo_state_cache_path, encoding="utf-8")
+            data = json.load(file)
+        except Exception as error: # pylint: disable=broad-exception-caught
+            print('Failed to load photo state cache:', error)
+        data[album] = {
+            'last_update':  int(time.time()),
+            'photo_states': state
+        }
+        try:
+            data_json = json.dumps(data)
+            file = open(self.config_file,"w", encoding="utf-8")
+            file.write(data_json)
+        except Exception as error: # pylint: disable=broad-exception-caught
+            print('Failed to load photo state cache:', error)
 
     def get_album_sync_photo_album_status(self, album, photo_location) -> dict:
         """ Get photo sync status """
@@ -390,6 +409,8 @@ class ICloud(): # pylint: disable=too-many-public-methods
                 SyncName=album, status="file_name_duplicated").set(file_name_duplicated_num)
         self.app.prom_metrics.gauge__icloud__photo_sync_state.labels(
                 SyncName=album, status="unkown").set(file_unkown_state)
+
+        self.write_album_sync_cache(album, photo_status)
 
         return photo_status
 

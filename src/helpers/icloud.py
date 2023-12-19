@@ -462,9 +462,9 @@ class ICloud(): # pylint: disable=too-many-public-methods
                 # File not downloaded, go and download
                 self.app.flask_app.logger.debug("Downloading photo: " + name)
                 return self.download_photo(photos[name]['photo'], photos[name]['photo_dir']), True
-            elif photos[name]['status'] == "file-name-duplicated":
+            elif photos[name]['status'] in ["file-name-duplicated", "file-change", "file-change-with-nonid-name"]:
                 # Found file with duplicate name, delete so sync can hande download next run
-                self.app.flask_app.logger.debug("Deleting duplicate name photo without id: " + name)
+                self.app.flask_app.logger.debug("Deleting " + photos[name]['status'] + " photo: " + name)
                 should_download = False
                 for old_path in photos[name]['old_file_paths']:
                     self.app.flask_app.logger.debug("Downloading photo: " + old_path)
@@ -477,14 +477,6 @@ class ICloud(): # pylint: disable=too-many-public-methods
                 # Found file with old naming style, move to new file name stlye
                 self.app.flask_app.logger.debug("Moving Photo photo: " + name)
                 return self.update_local_file_to_id(photos[name]), False
-            # Disabling till multiple photos with same name issue fixed
-            # elif photos[name]['status'] == "file-change":
-            #     self.app.flask_app.logger.debug("Deleting photo: " + name)
-            #     if self.delete_local_photo(photos[name]):
-            #         self.app.flask_app.logger.debug("Downloading photo: " + name)
-            #         return self.download_photo(photos[name]['photo'], photos[name]['photo_dir']), True
-            #     else:
-            #         return False, False
             else:
                 self.app.flask_app.logger.debug("Status action not implemnented for: " + photos[name]['status'])
         return True, False

@@ -282,7 +282,7 @@ class ICloud(): # pylint: disable=too-many-public-methods
         }
         try:
             data_json = json.dumps(data)
-            file = open(self.config_file,"w", encoding="utf-8")
+            file = open(self.photo_state_cache_path,"w", encoding="utf-8")
             file.write(data_json)
         except Exception as error: # pylint: disable=broad-exception-caught
             print('Failed to load photo state cache:', error)

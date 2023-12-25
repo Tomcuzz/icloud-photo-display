@@ -285,7 +285,7 @@ class ICloud(): # pylint: disable=too-many-public-methods
             file = open(self.app.settings.photo_state_cache_path,"w", encoding="utf-8")
             file.write(data_json)
         except Exception as error: # pylint: disable=broad-exception-caught
-            print('Failed to load photo state cache:', error)
+            print('Failed to save photo state cache:', error)
 
     def get_album_sync_photo_album_status(self, album, photo_location) -> dict:
         """ Get photo sync status """

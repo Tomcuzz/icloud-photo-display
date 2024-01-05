@@ -284,6 +284,7 @@ class ICloud(): # pylint: disable=too-many-public-methods
             data_json = json.dumps(data)
             file = open(self.app.settings.photo_state_cache_path,"w", encoding="utf-8")
             file.write(data_json)
+            print('Photo state cache written to: ' + self.app.settings.photo_state_cache_path)
         except Exception as error: # pylint: disable=broad-exception-caught
             print('Failed to save photo state cache:', error)
 

@@ -28,6 +28,8 @@ def add_photo_page(app, app_helper:AppHelper):
             app_helper.prom_metrics.counter__error__404.inc()
             abort(404)
         disk_photos = paths.get_files_on_disk(app_helper.configs.photo_location)
+        if filename == "random":
+            filename = random.choice(list(disk_photos.keys()))
         if  filename not in disk_photos:
             app_helper.prom_metrics.counter__error__404.inc()
             abort(404)

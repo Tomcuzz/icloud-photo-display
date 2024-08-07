@@ -530,9 +530,9 @@ class ICloud(): # pylint: disable=too-many-public-methods
                 SyncName=album_name).state('running')
             start = datetime.now()
             self.setup_photo_error_handler()
-            self.app.flask_app.logger.debug(album_name + " Sync - Getting statuses")
+            self.app.flask_app.logger.info(album_name + " Sync - Getting statuses")
             photos = self.get_album_sync_photo_album_status(album_name, download_path)
-            self.app.flask_app.logger.debug(album_name + " Sync - Photo Status Recieved")
+            self.app.flask_app.logger.info(album_name + " Sync - Photo Status Recieved")
             download_failures = 0
             for photo in photos:
                 try:

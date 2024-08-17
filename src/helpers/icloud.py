@@ -297,7 +297,9 @@ class ICloud(): # pylint: disable=too-many-public-methods
             return {}
         self.setup_photo_error_handler()
         photo_status = {}
+        self.app.flask_app.logger.debug(album + " sync - Getting files on disk")
         files_on_disk = paths.get_files_on_disk(photo_location)
+        self.app.flask_app.logger.debug(album + " sync - Getting files on disk finished")
         for _ in range(3): # pylint: disable=too-many-nested-blocks
             try:
                 if album in self.api.photos.albums:

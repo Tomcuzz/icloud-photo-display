@@ -300,7 +300,7 @@ class ICloud(): # pylint: disable=too-many-public-methods
         self.app.flask_app.logger.debug(album + " sync - Getting files on disk")
         files_on_disk = paths.get_files_on_disk(photo_location)
         self.app.flask_app.logger.debug(album + " sync - Getting files on disk finished")
-        for _ in range(3): # pylint: disable=too-many-nested-blocks
+        for retry_loop in range(3): # pylint: disable=too-many-nested-blocks
             try:
                 if album in self.api.photos.albums:
                     self.app.flask_app.logger.debug(
@@ -312,6 +312,10 @@ class ICloud(): # pylint: disable=too-many-public-methods
                     for photo in self.api.photos.albums[album]:
                         photo_loop_id += 1
                         if photo.item_type not in ("image"):
+                            self.app.flask_app.logger.debug(
+                                album + " sync - (" + str(photo_loop_id) + "/" +
+                                str(num_files) + ") File '" + photo.filename +
+                                "' Skipping non-image (" + photo.item_type + ") with id: " + photo.id)
                             continue
 
                         save_item = {
@@ -377,7 +381,9 @@ class ICloud(): # pylint: disable=too-many-public-methods
                             photo_status[key] = save_item
                 else:
                     self.app.flask_app.logger.error("Photo Album '" + album + "' not found")
+                
                 # Break as we now got to end of sync and dont need to retry
+                self.app.flask_app.logger.debug(album + " sync - Status Loop Complete")
                 break
             except exceptions.PyiCloudAPIResponseError as err:
                 self.app.prom_metrics.counter__icloud__errors.inc()
@@ -387,7 +393,11 @@ class ICloud(): # pylint: disable=too-many-public-methods
                         self.api.authenticate()
                 else:
                     self.app.flask_app.logger.error("iCloud API error: " + err)
+        
+            self.app.flask_app.logger.debug(
+                album + " sync - Reached error state on Status Loop (retry: " + retry_loop + ")")
 
+        self.app.flask_app.logger.debug(album + " sync - Processign metrics")
         file_synced = 0
         file_change_num = 0
         file_synced_with_nonid_name = 0
@@ -427,6 +437,7 @@ class ICloud(): # pylint: disable=too-many-public-methods
         self.app.prom_metrics.gauge__icloud__photo_sync_state.labels(
                 SyncName=album, status="unkown").set(file_unkown_state)
 
+        self.app.flask_app.logger.debug(album + " sync - Writing Album Sync Cache")
         self.write_album_sync_cache(album, photo_status)
 
         return photo_status
